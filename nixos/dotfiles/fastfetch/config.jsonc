@@ -1,0 +1,104 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+    "type": "kitty-direct",
+    "source": "/home/pakiknowledge/.config/fastfetch/nix-b-e.png",
+    "width" : 30,
+    "height": 20
+ },
+  "display": {
+    "separator": " ",
+    "color": {
+      "title": "#bfc9c3",
+      "output": "#bfc9c3"
+    }
+  },
+  "modules": [
+    "break",
+    {
+      "type": "os",
+      "key": "OS",
+      "keyColor": "#88d6bb"
+    },
+    {
+      "type": "kernel",
+      "key": " ├   KER",
+      "keyColor": "#88d6bb"
+    },
+    {
+      "type": "packages",
+      "key": " ├   PAK",
+      "format": "{all}",
+      "keyColor": "#88d6bb"
+    },
+    {
+      "type": "title",
+      "key": " └   USR",
+      "keyColor": "#88d6bb"
+    },
+    "break",
+    "break",
+    {
+      "type": "wm",
+      "key": "WM",
+      "keyColor": "#a8cbe2"
+    },
+    {
+      "type": "de",
+      "key": " ├ 󱈹  DES",
+      "keyColor": "#a8cbe2"
+    },
+    {
+      "type": "shell",
+      "key": " ├   SHE",
+      "keyColor": "#a8cbe2"
+    },
+    {
+      "type": "terminal",
+      "key": " ├   TER",
+      "keyColor": "#a8cbe2"
+    },
+    {
+      "type": "terminalfont",
+      "key": " └   TFO",
+      "keyColor": "#a8cbe2"
+    },
+    "break",
+    "break",
+    {
+      "type": "host",
+      "key": "PC",
+      "keyColor": "#cee9dd"
+    },
+    {
+      "type": "cpu",
+      "key": " ├   CPU",
+      "keyColor": "#cee9dd"
+    },
+    {
+      "type": "memory",
+      "key": " ├   MEM",
+      "keyColor": "#cee9dd"
+    },
+    {
+      "type": "gpu",
+      "key": " ├ 󰢮  GPU",
+      "format": "{1} {2}",
+      "keyColor": "#cee9dd"
+    },
+    {
+      "type": "display",
+      "key": " ├   MON",
+      "format": "{name} {width}x{height}@{refresh-rate}",
+      "keyColor": "#cee9dd"
+    },
+    {
+      "type": "disk",
+      "key": " └ 󰋊  DIS",
+      "keyColor": "#cee9dd"
+    },
+    "break",
+    "break",
+    "colors"
+  ]
+}
