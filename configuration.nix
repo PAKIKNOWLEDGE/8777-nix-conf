@@ -207,14 +207,24 @@
     options = "--delete-older-than 7d";
   };
 
+  # 在特定的环境下 fcitx5 的环境变量需要显式声明才能被应用继承
+  environment.sessionVariables = {
+    GTK_IM_MODULE = "fcitx";
+    QT_IM_MODULE = "fcitx";
+    XMODIFIERS = "@im=fcitx";
+    SDL_IM_MODULE = "fcitx";
+  };
+
   # ----- 输入法配置 (fcitx5) -----
   # 这是启用中文输入法的标准方式，请勿将 fcitx5 添加到 systemPackages。
   i18n.inputMethod = {
     enable = true;
-    type = "fcitx5";                     # 使用 fcitx5 框架
+    type = "fcitx5";
     fcitx5.addons = with pkgs; [
-      fcitx5-rime                        # 中州韵输入法引擎（功能强大，支持各种方案）
-      fcitx5-gtk                         # 为 GTK 程序提供输入法支持
+      (fcitx5-rime.override { rimeDataPkgs = [ rime-ice ]; })  # Rime + 雾凇拼音 
+                                                               # note2:要用包裹式的override写法
+
+      fcitx5-gtk                         # GTK 程序支持
       qt6Packages.fcitx5-configtool      # 图形化配置工具
     ];
   };
