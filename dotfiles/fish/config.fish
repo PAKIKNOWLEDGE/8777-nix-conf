@@ -66,8 +66,8 @@ abbr reboot 'systemctl reboot'
 # 启动时显示系统信息（xfce4-terminal 内的 session 用 hyfetch 区别对待）
 set -l ppid (ps -p $fish_pid -o ppid= 2>/dev/null | string trim)
 set -l pname (ps -p $ppid -o comm= 2>/dev/null | string trim)
-if test "$pname" = xfce4-terminal
-    hyfetch --distro debian 2>/dev/null
+if test "$pname" = .xfce4-terminal
+    hyfetch 2>/dev/null
 else
     fastfetch
 end

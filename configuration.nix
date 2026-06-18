@@ -11,23 +11,21 @@
   # 每个 import 的文件都可以声明 boot、services、environment 等选项
   # NixOS 在构建时把所有这些声明合并成一个系统
   imports =
-    [ ./hardware-configuration.nix   # 硬件配置（自动生成，不变）
+    [ ./hardware-configuration.nix   # 硬件配置（自动生成，不变） 在迁移时，此部分是不可共通的
     ];
-
-  # Home Manager 已移除——dotfiles 手动管理，不再经过 Nix store 只读层
 
   # ----- 引导程序 -----
   # 使用 systemd-boot 作为 UEFI 引导管理器。
   boot.loader.systemd-boot.enable = true;
   # 允许 systemd-boot 修改 EFI 变量（安装时自动配置）。
   boot.loader.efi.canTouchEfiVariables = true;
-  # 限制引导菜单保留最近 10 个 generation，防止无限堆积
+  # 限制引导菜单保留最近 5 个 generation，防止无限堆积
   boot.loader.systemd-boot.configurationLimit = 5;
 
   # ----- 网络 -----
   # 设置主机名。
   networking.hostName = "K1llingMyL0v3";
-  # 启用 NetworkManager（图形化网络管理工具，推荐桌面用户使用）。
+  # 启用 NetworkManager
   networking.networkmanager.enable = true;
 
   # 如果需要配置网络代理，请取消注释并修改
@@ -59,10 +57,10 @@
   services.xserver.enable = true;
 
   # 启用 XFCE 桌面环境
-  # LightDM → SDDM（SDDM 更美观，主题丰富，且和 i3 配合更好）
-  services.displayManager.sddm.enable = true;              # SDDM（旧名 services.xserver.displayManager.sddm）
+  # LightDM → SDDM
+  services.displayManager.sddm.enable = true;              # 之前写错了（旧名 services.xserver.displayManager.sddm）
   services.xserver.desktopManager.xfce.enable = true;     # XFCE
-  # 加上 i3 窗口管理器（登录会话时可选择 XFCE 或 i3）
+  # i3  
   services.xserver.windowManager.i3.enable = true;
 
   # 设置键盘布局为中文
@@ -106,7 +104,7 @@
     packages = with pkgs; [
       # ----- 日常 CLI -----
       bat ripgrep fd fzf eza lazygit zoxide yazi
-      btop htop fastfetch tree
+      btop htop fastfetch tree hyfetch
 
       # ----- i3 生态 -----
       rofi picom dunst nitrogen flameshot xautolock maim i3lock xclip
@@ -138,7 +136,7 @@
   #   systemPackages → /run/current-system/sw/bin/、所有用户
   #   users.users.xxx.packages → ~/.nix-profile/bin/、仅当前用户
   #
-  # 原则：大件软件、系统工具放这里；个人 CLI 工具放 users.users.pakiknowledge.packages
+  # 大件软件、系统工具放这里；个人 CLI 工具放 users.users.pakiknowledge.packages
   # 注意：输入法（如 fcitx5）不应添加在这里，它们有专门的配置选项。
   # note1:在nix语言中，列表构造优先级竟然是高于函数对，这太可怕了
   # 然而更恐怖的是 如果不适用括号 列表会认为它接受了两个元素
