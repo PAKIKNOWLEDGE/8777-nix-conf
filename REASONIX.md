@@ -25,4 +25,4 @@ loaded into the immutable system prefix every session — keep it terse.
 ## 下次要做的
 1. `sudo nixos-rebuild switch`
 2. `cp -r ~/nix/nixos/dotfiles/* ~/.config/`
-3. 为 T430 迁移做准备给你之前的上下文
+3. 为 T430 迁移做准备

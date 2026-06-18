@@ -95,7 +95,7 @@
 
   # ----- 用户账户 -----
   # 定义你的用户。
-  users.users."pakiknowledge" = {
+  users.users."pakiknowledge" = {       # 注意：在迁移的时候这个地方非常重要！！如果用户名不一致了系统会broken。
     isNormalUser = true;                # 普通用户，而非系统服务账户
     description = "PAKI KNOWLEDGE";     # 我的全名
     extraGroups = [ "networkmanager" "wheel" ]; # 加入这些组以获取网络管理和 sudo 权限
