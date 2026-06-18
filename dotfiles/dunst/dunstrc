@@ -1,0 +1,57 @@
+[global]
+    # 通知窗口的位置
+    origin = top-right
+    # 窗口偏移量 (水平, 垂直)
+    offset = (10, 50)
+    # 通知的宽度 (最小, 最大)
+    width = (0, 300)
+    # 每条通知的高度
+    height = (0, 100)
+
+    # 字体设置 (请根据系统字体调整)
+    font = "Noto Sans 10"
+
+    # 时间格式
+    format = "<b>%s</b>\n%b"
+
+    # 通知显示时长 (毫秒)
+    timeout = 10000
+
+    # 窗口圆角
+    corner_radius = 8
+
+    # 通知之间的间隙
+    gap_size = 2
+
+    # 边框宽度
+    frame_width = 2
+
+    # 帧颜色
+    frame_color = "#8aadf4"
+
+    # 进度条颜色
+    highlight = "#8aadf4"
+
+    # 分隔线颜色 (设置为 frame 即使用 frame_color)
+    separator_color = frame
+
+# 低优先级通知样式
+[urgency_low]
+    background = "#24273a"
+    foreground = "#cad3f5"
+    frame_color = "#8aadf4"
+    timeout = 5000
+
+# 普通优先级通知样式
+[urgency_normal]
+    background = "#24273a"
+    foreground = "#cad3f5"
+    frame_color = "#8aadf4"
+    timeout = 10000
+
+# 高优先级通知样式
+[urgency_critical]
+    background = "#24273a"
+    foreground = "#cad3f5"
+    frame_color = "#f5a97f"
+    timeout = 0

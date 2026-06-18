@@ -48,7 +48,7 @@ end
 
 # bat 代替 cat
 function cat
-    command batcat $argv
+    command bat $argv
 end
 
 # eza 代替 ls
