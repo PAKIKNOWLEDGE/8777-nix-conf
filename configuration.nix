@@ -118,10 +118,13 @@
       # ----- 个人工具 -----
       go-musicfox gh haskellPackages.greenclip
 
-      # ----- 字体 -----
-      pkgs.nerd-fonts.jetbrains-mono
     ];
   };
+
+  # 字体注册到 fontconfig，GUI 程序才能找到
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+  ];
 
   # 启用 Firefox（使用 NixOS 的“程序模块”方式安装，会自动处理浏览器配置）。
   programs.firefox.enable = true;
@@ -185,14 +188,17 @@
 
   # ----- 8777 的个人定制部分 -----
 
-  # 使用中科大（USTC）镜像源加速软件包下载。
-  # 这里将中科大源设置为优先，官方源作为备用。
+  # 使用中科大（USTC）镜像源
   nix.settings = {
     substituters = [
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://cache.nixos.org/"
     ];
   };
+
+  # 首次装机后还需执行一次（让 nixpkgs 源码也从 USTC 走）：
+  #   sudo nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05 nixos
+  #   sudo nix-channel --update
 
   # 自动垃圾回收——每周清理 7 天前的旧 generation
   nix.gc = {
