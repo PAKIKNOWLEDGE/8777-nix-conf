@@ -91,34 +91,16 @@
 
   # 触摸板支持（通常已在桌面环境中默认启用，此处保留可选项）。
   # 上面的，我用i3wm你不炸了吗
-  services.libinput.enable = true;                         # 旧名 services.xserver.libinput
+  services.libinput.enable = true;       # 旧名 services.xserver.libinput
 
   # ----- 用户账户 -----
   # 定义你的用户。
-  users.users."pakiknowledge" = {       # 注意：在迁移的时候这个地方非常重要！！如果用户名不一致了系统会broken。
+  users.users."pakiknowledge" = {       # 注意：在迁移的时候这个地方非常重要！！
+    # 如果用户名不一致了系统会broken。
     isNormalUser = true;                # 普通用户，而非系统服务账户
     description = "PAKI KNOWLEDGE";     # 我的全名
     extraGroups = [ "networkmanager" "wheel" ]; # 加入这些组以获取网络管理和 sudo 权限
-    shell = pkgs.fish;                  # 默认 shell 设为 fish（不用 chsh，声明式搞定）
-    # 用户级别的软件包（只会安装给这个用户，不会影响其他用户）。
-    packages = with pkgs; [
-      # ----- 日常 CLI -----
-      bat ripgrep fd fzf eza lazygit zoxide yazi
-      btop htop fastfetch tree hyfetch
-
-      # ----- i3 生态 -----
-      rofi picom dunst nitrogen flameshot xautolock maim i3lock xclip
-
-      # ----- 终端 -----
-      wezterm starship
-
-      # ----- 编辑器 -----
-      neovim kdePackages.kate
-
-      # ----- 个人工具 -----
-      go-musicfox gh haskellPackages.greenclip
-
-    ];
+    shell = pkgs.fish;                  # 默认 shell 设为 fish
   };
 
   # 字体注册到 fontconfig，GUI 程序才能找到
@@ -131,6 +113,9 @@
 
   programs.fish.enable = true;
 
+  # GTK 主题需要 dconf 才能生效（没有 dconf，settings.ini 不会被读）
+  programs.dconf.enable = true;
+
   # ----- 软件包管理 -----
   # 允许安装许可证不自由的软件包（如 Chrome、Nvidia 驱动等）。
   nixpkgs.config.allowUnfree = true;
@@ -139,31 +124,76 @@
   #   systemPackages → /run/current-system/sw/bin/、所有用户
   #   users.users.xxx.packages → ~/.nix-profile/bin/、仅当前用户
   #
-  # 大件软件、系统工具放这里；个人 CLI 工具放 users.users.pakiknowledge.packages
+  # 这是一个声明列表。
   # 注意：输入法（如 fcitx5）不应添加在这里，它们有专门的配置选项。
   # note1:在nix语言中，列表构造优先级竟然是高于函数对，这太可怕了
   # 然而更恐怖的是 如果不适用括号 列表会认为它接受了两个元素
   environment.systemPackages = with pkgs; [
-    # Error1：kate 是 KDE 的编辑器，在较新的 Nixpkgs 中需要指定 kdePackages 前缀。
-    kdePackages.kate            # 挚爱
-    neovim                      # lazy
-    fastfetch                   #
-    # 注意：Nix 列表元素前的空格不能多！列表解析是严格的，多一个空格会被当成不同标识符
-    git                         # 我（事实上，git means '饭桶'，不过本人近日体重43kg）
-    # 2026-06-17 17:10
+    # ── 日常 CLI ──
+    bat                         # 轻量级 cat 替代
+    ripgrep                     # 快速 grep 替代
+    fd                          # 友好版 find
+    fzf                         # 模糊搜索 此外 fzf为被仓库的sync脚本依赖
+    eza                         # ls 替代
+    lazygit                     # TUI Git 客户端
+    zoxide                      # 智能 cd
+    yazi                        # TUI 文件管理器
+
+    btop                        # 任务管理器（对 terminal 渲染有要求）
+    htop                        # 任务管理器基础版
+    fastfetch                   # 系统信息
+    tree                        # 树状图显示目录
+    hyfetch                     # 彩色系统信息（xfce4-terminal 专用\无图像协议terminal方案）
+
+    # ── 网络工具 ──
+    git                         # 饭桶 
     wget                        # 迅雷下载破解版
     curl                        # 迅雷下载无敌版
-    htop                        # 任务管理器黑客帝国版
-    btop                        # 他俩有啥区别 我只知道一个对于terminal渲染尺寸有要求
-                                # 到底是哪个呢.....
-    tree                        # 歪脖子树 （划掉）以树状图显示目录结构
-    unzip                      # 360一键压缩破解版
-    nodejs                     # agent 启动
-    fish                       # 哦哦。
-    clash-verge-rev            # 代理客户端，大陆用户必备
-    gh                         # GitHub CLI，给 GitHub 拉 dotfiles 用的
-    gcc                        # nvim-treesitter 编译 parser 需要 C 编译器
-    tree-sitter                # nvim-treesitter 编译 parser 需要 CLI
+    gh                          # GitHub CLI
+
+    # ── 开发 ──
+    nodejs                      # agent 启动
+    gcc                         # nvim-treesitter 编译 parser
+    tree-sitter                 # nvim-treesitter 编译 CLI
+
+    # ── i3 生态 ──
+    rofi                        # 启动器
+    picom                       # 窗口合成器（透明/阴影）
+    dunst                       # 通知守护进程
+    nitrogen                    # 壁纸设置
+    flameshot                   # 截图工具
+    xautolock                   # 自劢锁屏
+    maim                        # 截图（命令行）
+    i3lock                      # 锁屏
+    xclip                       # 剪贴板
+    i3status-rust               # 个人认为 i3status比较乏力 请farris帮个忙吧🦀
+
+    # ── 主题/外观 ──
+    colloid-gtk-theme           # GTK 主题
+    papirus-icon-theme          # 图标主题
+    # 不要用lxappearance 这在nix上不起作用
+
+    # ── 终端 ──
+    wezterm                     # 终端模拟器
+    starship                    # 提示符
+    fish                        # 哦哦。
+
+    # ── 编辑器 ──
+    neovim                      # lazy
+    kdePackages.kate            # 挚爱
+
+    # ── Design ──
+     krita 
+    # 这个地方大概会让构建过程多一分钟时间
+    # Qt库太大了
+    # 没办法你们忍一下
+
+
+    # ── 工具 ──
+    unzip                       # 360一键压缩破解版
+    clash-verge-rev             # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
+    go-musicfox                 # 网易云音乐 TUI
+    haskellPackages.greenclip   # 剪贴板管理器
   ];
 
   # ----- 可选程序配置（需要额外配置的服务）-----
@@ -194,6 +224,8 @@
       "https://mirrors.ustc.edu.cn/nix-channels/store"
       "https://cache.nixos.org/"
     ];
+    trusted-users = [ "root" "pakiknowledge" ];
+    experimental-features = [ "nix-command" "flakes" ];
   };
 
   # 首次装机后还需执行一次（让 nixpkgs 源码也从 USTC 走）：
