@@ -144,8 +144,8 @@ gaps outer 5
 bar {
     # 默认使用 i3status（轻量稳定）
     # 双电池加 last_full_capacity = true，参考 i3status/config
-    status_command i3status
-    # status_command i3status-rs /home/pakiknowledge/.config/i3status-rust/config.toml
+    #status_command i3status
+    status_command i3status-rs /home/pakiknowledge/.config/i3status-rust/config.toml
     position top
     font pango:JetBrainsMono Nerd Font, Sarasa UI SC 12
     separator_symbol " │ "
