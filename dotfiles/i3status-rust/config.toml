@@ -37,7 +37,20 @@ interval = 5
 [[block]]
 block = "battery"
 driver = "upower"
-format = " $icon $percentage "
+device = "BAT0"
+format = " $icon B0: $percentage "
+full_format = " $icon B0: $percentage "
+empty_format = " $icon B0: $percentage "
+not_charging_format = " $icon B0: $percentage "
+
+[[block]]
+block = "battery"
+driver = "upower"
+device = "BAT1"
+format = " $icon B1: $percentage "
+full_format = " $icon B1: $percentage "
+empty_format = " $icon B1: $percentage "
+not_charging_format = " $icon B1: $percentage "
 
 [[block]]
 block = "time"

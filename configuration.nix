@@ -194,6 +194,7 @@
     clash-verge-rev             # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
     go-musicfox                 # 网易云音乐 TUI
     haskellPackages.greenclip   # 剪贴板管理器
+
   ];
 
   # ----- 可选程序配置（需要额外配置的服务）-----

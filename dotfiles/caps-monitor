@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# 监控 Caps Lock 状态变化，变更时弹 dunst 通知
+
+prev=""
+while true; do
+    status=$(xset q | grep 'Caps Lock' | awk '{print $4}')
+    if [ "$status" != "$prev" ] && [ -n "$prev" ]; then
+        if [ "$status" = "on" ]; then
+            dunstify -h string:fgcolor:#f5a97f -t 1500 "󰘶 CAPS LOCK ON"
+        else
+            dunstify -h string:fgcolor:#a5adcb -t 1500 "󰘶 CAPS LOCK OFF"
+        fi
+    fi
+    prev="$status"
+    sleep 0.3
+done

@@ -26,6 +26,7 @@ exec_always fcitx5 -d --replace
 
 ### 通知
 exec dunst
+exec_always --no-startup-id ~/.config/caps-monitor
 
 ### 合成器 (透明/抗撕裂)
 exec picom -b --backend glx --vsync
