@@ -5,5 +5,6 @@ return {
     opts.completion = opts.completion or {}
     opts.completion.completeopt = "menu,menuone,noselect"
     opts.preselect = require("cmp.types.cmp").PreselectMode.None
+    return opts
   end,
 }
