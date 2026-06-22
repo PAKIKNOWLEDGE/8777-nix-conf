@@ -192,6 +192,7 @@
     # 没办法你们忍一下
     matugen   # MaterialYou有没有懂的
     papers    # PDF reader 
+    hugo
 
 
     # ── 工具 ──
