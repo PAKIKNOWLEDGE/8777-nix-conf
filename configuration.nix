@@ -116,6 +116,9 @@
   # GTK 主题需要 dconf 才能生效（没有 dconf，settings.ini 不会被读）
   programs.dconf.enable = true;
 
+  # 启用OpenGL驱动
+  hardware.graphics.enable = true; 
+
   # ----- 软件包管理 -----
   # 允许安装许可证不自由的软件包（如 Chrome、Nvidia 驱动等）。
   nixpkgs.config.allowUnfree = true;
@@ -187,7 +190,8 @@
     # 这个地方大概会让构建过程多一分钟时间
     # Qt库太大了
     # 没办法你们忍一下
-    matugen   #MaterialYou有没有懂的
+    matugen   # MaterialYou有没有懂的
+    papers    # PDF reader 
 
 
     # ── 工具 ──

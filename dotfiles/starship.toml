@@ -23,6 +23,7 @@ $python\
 $docker_context\
 $conda\
 $pixi\
+${nix_shell}\
 [](fg:color_bg3 bg:color_bg1)\
 $time\
 [ ](fg:color_bg1)\
@@ -58,6 +59,7 @@ Manjaro = ""
 Linux = "󰌽"
 Gentoo = "󰣨"
 Fedora = "󰣛"
+NixOS = "󱄅"
 Alpine = ""
 Amazon = ""
 Android = ""
@@ -70,7 +72,6 @@ Debian = "󰣚"
 Redhat = "󱄛"
 RedHatEnterprise = "󱄛"
 Pop = ""
-
 [username]
 show_always = true
 style_user = "bg:color_orange fg:color_fg0"
@@ -170,6 +171,12 @@ format = '[[  $time ](fg:color_fg1 bg:color_bg1)]($style)'
 
 [line_break]
 disabled = false
+
+
+
+[nix_shell]
+format = "[ ❄️ ]($style)"
+style = "bg:color_bg3"
 
 [character]
 disabled = false
