@@ -1,23 +1,24 @@
 [theme]
 theme = "native"
+overrides = { spacing = 0 }
 
 [icons]
 icons = "material-nf"
 
 [[block]]
 block = "net"
-format = " $icon $signal_strength "
+format = "$icon $signal_strength"
 device = "^wl"
 interval = 10
 
 [[block]]
 block = "net"
-format = " $icon $ip "
+format = "$icon $ip"
 device = "^en"
 
 [[block]]
 block = "sound"
-format = " $icon $volume "
+format = "$icon $volume"
 device = "pulse"
 
 [[block]]
@@ -26,8 +27,8 @@ interval = 2
 
 [[block]]
 block = "memory"
-format = " $icon $mem_used.eng(w:1) "
-format_alt = " $icon_swap $swap_used_percents.eng(w:1) "
+format = "$icon $mem_used.eng(w:1)"
+format_alt = "$icon_swap $swap_used_percents.eng(w:1)"
 interval = 10
 
 [[block]]
@@ -38,21 +39,21 @@ interval = 5
 block = "battery"
 driver = "upower"
 device = "BAT0"
-format = " $icon B0: $percentage "
-full_format = " $icon B0: $percentage "
-empty_format = " $icon B0: $percentage "
-not_charging_format = " $icon B0: $percentage "
+format = "$icon B0:$percentage"
+full_format = "$icon B0:$percentage"
+empty_format = "$icon B0:$percentage"
+not_charging_format = "$icon B0:$percentage"
 
 [[block]]
 block = "battery"
 driver = "upower"
 device = "BAT1"
-format = " $icon B1: $percentage "
-full_format = " $icon B1: $percentage "
-empty_format = " $icon B1: $percentage "
-not_charging_format = " $icon B1: $percentage "
+format = "$icon B1:$percentage"
+full_format = "$icon B1:$percentage"
+empty_format = "$icon B1:$percentage"
+not_charging_format = "$icon B1:$percentage"
 
 [[block]]
 block = "time"
 interval = 5
-format = " $icon $timestamp.datetime(f:'%m-%d %H:%M') "
+format = "$icon $timestamp.datetime(f:'%m-%d %H:%M')"
