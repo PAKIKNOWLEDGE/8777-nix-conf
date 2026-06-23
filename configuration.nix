@@ -170,6 +170,8 @@
     i3lock                      # 锁屏
     xclip                       # 剪贴板
     i3status-rust               # 个人认为 i3status比较乏力 请farris帮个忙吧🦀
+    pulseaudio          # 提供 pactl FN+fx 
+    brightnessctl       # 提供 brightnessctl FN+fx 
 
     # ── 主题/外观 ──
     colloid-gtk-theme           # GTK 主题
