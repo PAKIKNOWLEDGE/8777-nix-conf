@@ -14,6 +14,7 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)/dotfiles"
 LOCAL_DIR="$HOME/.config"
 
 EXCLUDE=(
+  --exclude=".git"
   --exclude="*.bak" --exclude="*.log"
   --exclude="lazy-lock.json" --exclude="generated.lua"
   --exclude="completions/" --exclude="conf.d/" --exclude="functions/"
