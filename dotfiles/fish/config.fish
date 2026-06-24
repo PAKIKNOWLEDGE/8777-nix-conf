@@ -34,7 +34,6 @@ zoxide init fish --cmd cd | source
 # 别名
 alias ds='reasonix code'
 alias luckerr='reasonix code'
-alias avim='NVIM_APPNAME=astrovim nvim'
 alias power='upower -i $(upower -e | grep 'BAT') | grep percentage' # 双电池用
 alias rebuild='sudo nixos-rebuild switch'
 
@@ -49,8 +48,8 @@ function y
 end
 
 # astrovim replace LazyVim
-function avim
-    NVIM_APPNAME=nvim-AstroNvim nvim $argv
+function lvim
+    NVIM_APPNAME=nvim-lazy nvim $argv
 end
 
 # bat 代替 cat

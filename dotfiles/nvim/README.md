@@ -1,51 +1,34 @@
-# lazyvim.chinese
+# AstroNvim Template
 
-离线 LazyVim 菜单汉化插件，为常见 `<leader>` 分组提供中文名称，并在 `<leader>u` 菜单下增加 `C` 项用于一键执行/取消汉化。
+**NOTE:** This is for AstroNvim v6+
 
-## 功能
+A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
 
-- 为常见 LazyVim 菜单分组提供中文名称（例如：`<leader>f` → 查找、`<leader>w` → 窗口等）
-- 在 `<leader>u` 菜单下增加 `C` 切换项：开启/关闭汉化
-- 完全离线，无需网络
+## 🛠️ Installation
 
-## 安装
+#### Make a backup of your current nvim and shared folder
 
-使用 `lazy.nvim`：
-
-```lua
-{
-  "xuxiaowei-com-cn/lazyvim.chinese",
-  config = function()
-    require("lazyvim_chinese").setup()
-  end,
-}
+```shell
+mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.local/share/nvim ~/.local/share/nvim.bak
+mv ~/.local/state/nvim ~/.local/state/nvim.bak
+mv ~/.cache/nvim ~/.cache/nvim.bak
 ```
 
-或在任意位置调用：
+#### Create a new user repository from this template
 
-```lua
-require("lazyvim_chinese").setup()
+Press the "Use this template" button above to create a new repository to store your user configuration.
+
+You can also just clone this repository directly if you do not want to track your user configuration in GitHub.
+
+#### Clone the repository
+
+```shell
+git clone https://github.com/<your_user>/<your_repository> ~/.config/nvim
 ```
 
-开发时配置：`~/.config/nvim/lua/plugins/lazyvim.chinese.lua`
+#### Start Neovim
 
-```lua
-return {
-  {
-    dir = "/Users/xuxiaowei/IdeaProjects/lazyvim.chinese",
-    lazy = false,
-    config = function()
-      require("lazyvim_chinese").setup()
-    end,
-  },
-}
+```shell
+nvim
 ```
-
-## 使用
-
-- 按 `<Space>uC`（`<leader>uC`）开启/关闭汉化
-- 开启后 WhichKey 的分组名称显示为中文，关闭后恢复英文
-
-## 自定义
-
-可在 `lua/lazyvim_chinese/translate.lua` 中按需增添/修改分组映射。

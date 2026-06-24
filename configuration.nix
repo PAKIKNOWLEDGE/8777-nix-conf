@@ -202,6 +202,7 @@
     clash-verge-rev             # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
     go-musicfox                 # 网易云音乐 TUI
     haskellPackages.greenclip   # 剪贴板管理器
+    simplescreenrecorder        # x11录屏 
 
   ];
 
