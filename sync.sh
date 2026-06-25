@@ -6,6 +6,7 @@
 #   ./sync.sh sync        本地 → 仓库
 #   ./sync.sh --deploy    仓库 → 本地
 #   ./sync.sh --list      列出托管应用
+#   ./sync.sh fish-setup  fish 便利链接
 #   ./sync.sh --help      帮助
 
 set -euo pipefail
@@ -63,6 +64,42 @@ list_apps() {
   done
 }
 
+# ===== fish 便利设置 =====
+fish_setup() {
+  echo ""
+  echo "▶ fish 便利链接检查"
+
+  links=(
+    ".fishrc:$HOME/.config/fish/config.fish"
+    ".fish_history:$HOME/.local/share/fish/fish_history"
+  )
+
+  any_missing=false
+
+  for entry in "${links[@]}"; do
+    link_name="${entry%%:*}"
+    link_target="${entry##*:}"
+    link_path="$HOME/$link_name"
+
+    if [ -L "$link_path" ] && [ "$(readlink "$link_path")" = "$link_target" ]; then
+      echo "  ✅ ~/$link_name → $link_target  (已存在，跳过)"
+    else
+      any_missing=true
+      if [ -e "$link_path" ] || [ -L "$link_path" ]; then
+        echo "  ⚠  ~/$link_name 存在但不是指向正确目标，跳过（手动处理）"
+      else
+        echo "  ➕ 创建 ~/$link_name → $link_target"
+        ln -s "$link_target" "$link_path"
+      fi
+    fi
+  done
+
+  if [ "$any_missing" = false ]; then
+    echo "  一切就绪，无需操作。"
+  fi
+  echo ""
+}
+
 # ===== 交互菜单 =====
 interactive_menu() {
   echo "dotfiles 同步工具"
@@ -74,9 +111,10 @@ interactive_menu() {
     echo "2) 仓库 → 本地   部署配置到系统"
     echo "3) 查看托管应用"
     echo "4) 帮助"
+    echo "5) fish 便利链接"
     echo "q) 退出"
     echo ""
-    read -r -p "选择 [1-4/q]: " choice || true
+    read -r -p "选择 [1-5/q]: " choice || true
 
     case "$choice" in
     1) sync_to_repo ;;
@@ -88,6 +126,7 @@ interactive_menu() {
       echo "与 ~/.config/ 下同名条目一一对齐"
       echo "新增应用直接在 dotfiles/ 下创建目录即可"
       ;;
+    5) fish_setup ;;
     q | Q | "")
       echo "再见 愿你的运行时沉睡在只读的哀叹冥河。(｡･ω･｡)ﾉ♡"
       exit 0
@@ -107,6 +146,7 @@ case "$1" in
 sync) sync_to_repo ;;
 --deploy | -d) deploy_to_local ;;
 --list | -l) list_apps ;;
+fish-setup) fish_setup ;;
 --help | -h)
   sed -n '2,10p' "$0"
   exit 0

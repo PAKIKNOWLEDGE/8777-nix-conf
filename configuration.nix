@@ -2,6 +2,26 @@
 # 帮助信息可在 configuration.nix(5) 手册页和 NixOS 手册中找到
 # （可通过运行 ‘nixos-help’ 访问）。
 
+/*
+写在前面：你需要做的——将nix配置纳入非sudo管理
+mkdir -p ~/nix
+sudo mv /etc/nixos/ ~/nix/            # 原始配置搬家到 ~/nix/nixos/
+sudo ln -s ~/nix/nixos /etc/nixos     # 软链占位，让系统能找到
+请注意，此时 /etc/nixos 指向 ~/nix/nixos/，里面的文件还是新机器默认生成的。
+切记：hardware-configuration.nix是每台机器独一无二的 仓库里也不会跟踪。
+这之后，进行系统源的配置：
+  # 首次装机后还需执行一次（让 nixpkgs 源码也从 USTC 走）：
+  #   sudo nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05 nixos
+  #   sudo nix-channel --update
+然后，可以构建系统的雏形。
+这之后，进行HM层面的构建。
+mkdir -p ~/.config/home-manager
+ln -sf /etc/nixos/home.nix ~/.config/home-manager/home.nix
+home-manager switch
+2026-06-25：此时，HM“仅”为了解决krita和onlyoffice这两个巨无霸。以后，会慢慢迭代，让更多的
+包也流入进HM管理的层面。
+
+*/
 { config, pkgs, ... }:
 
 {
@@ -72,7 +92,8 @@
   # ----- 打印 -----
   # 启用 CUPS 打印服务（经典打印系统）。
   # 这有啥用？
-  services.printing.enable = true;
+  # 关了
+  services.printing.enable = false;
 
   # ----- 声音和音频  -----
   # 禁用 PulseAudio（使用 PipeWire 替代）。
@@ -100,6 +121,7 @@
     isNormalUser = true;                # 普通用户，而非系统服务账户
     description = "PAKI KNOWLEDGE";     # 我的全名
     extraGroups = [ "networkmanager" "wheel" ]; # 加入这些组以获取网络管理和 sudo 权限
+                                                # 未来可能需要video组支持
     shell = pkgs.fish;                  # 默认 shell 设为 fish
   };
 
@@ -131,6 +153,12 @@
   # 注意：输入法（如 fcitx5）不应添加在这里，它们有专门的配置选项。
   # note1:在nix语言中，列表构造优先级竟然是高于函数对，这太可怕了
   # 然而更恐怖的是 如果不适用括号 列表会认为它接受了两个元素
+  /*
+  2026-06-25： 本配置正在进行重构。一些太大的包，例如需要拉下庞大Qt库的krita，
+  和onlyoffice等，统一在home.nix中管理。为何这样做？这是为了方便更快的构建
+  系统的雏形。以后，一些非必要的包，也会移动入home.nix.
+  */
+
   environment.systemPackages = with pkgs; [
     # ── 日常 CLI ──
     bat                         # 轻量级 cat 替代
@@ -188,14 +216,9 @@
     kdePackages.kate            # 挚爱
 
     # ── Design ──
-     krita 
-    # 这个地方大概会让构建过程多一分钟时间
-    # Qt库太大了
-    # 没办法你们忍一下
     matugen   # MaterialYou有没有懂的
     papers    # PDF reader 
     hugo
-
 
     # ── 工具 ──
     unzip                       # 360一键压缩破解版
@@ -204,7 +227,36 @@
     haskellPackages.greenclip   # 剪贴板管理器
     simplescreenrecorder        # x11录屏 
 
+    # ── Home Manager ──
+    home-manager                # 用户级包管理器工具
+
   ];
+
+
+  /*
+  nix-ld 是 NixOS 提供的一个特殊的动态链接器加载器（或者说是一个兼容层）。
+  它的核心作用是：在 NixOS 系统上，为那些“预期在标准 Linux 环境（FHS）下运行”的动态链接程序，
+  提供一个模拟的标准库路径（比如 /lib、/usr/lib）。
+  当这样的程序运行时，nix-ld 会拦截它查找动态库的请求，并根据你的配置,
+  在 /nix/store 中找到对应的库文件提供给程序使用。
+  ld与pkg必须共存，可以说，ld是针对pkg的额外配置。
+  pkg的声明会将系统包置入系统，而ld为pkg提供了更进一步的动态链接索引。
+  此问题在配置AstrVim、LazyVim的某些插件时出现。没有配置ld会直接导致插件down掉。
+  */ 
+
+  programs.nix-ld = {
+  enable = true;
+  libraries = with pkgs; [
+    # 添加 tree-sitter 及其可能依赖的库
+    tree-sitter
+    stdenv.cc.cc.lib
+    glib
+    zlib
+    # 如果后续还有其他库缺失的报错，可以在这里继续追加
+  ];
+};
+
+
 
   # ----- 可选程序配置（需要额外配置的服务）-----
   # programs.mtr.enable = true;           # 网络诊断工具

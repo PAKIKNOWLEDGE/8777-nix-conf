@@ -36,6 +36,8 @@ alias ds='reasonix code'
 alias luckerr='reasonix code'
 alias power='upower -i $(upower -e | grep 'BAT') | grep percentage' # 双电池用
 alias rebuild='sudo nixos-rebuild switch'
+alias avim='nvim' # 肌肉记忆没救了
+alias homebuild='home-manager switch' 
 
 # yazi 退出后自动 cd 到浏览目录
 function y
