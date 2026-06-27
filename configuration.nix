@@ -267,6 +267,7 @@ home-manager switch
 
   # ----- 系统服务 -----
   # services.openssh.enable = true;       # 启用 OpenSSH 远程访问服务
+    services.libinput.touchpad.tappingDragLock = false; # 你们知道触控板轻触误触多恶心吗
 
   # ----- 防火墙 -----
   # networking.firewall.allowedTCPPorts = [ ... ];   # 开放指定 TCP 端口
