@@ -34,6 +34,7 @@ exec picom -b --backend glx --vsync
 ### 触摸板 (libinput 驱动)
 exec_always xinput set-prop "Synaptics TM3075-002" "libinput Tapping Enabled" 1
 exec_always xinput set-prop "Synaptics TM3075-002" "libinput Natural Scrolling Enabled" 1
+exec_always xinput set-prop "Synaptics TM3075-002" "libinput Disable While Typing Enabled" 1
 
 ### 键盘布局
 exec_always setxkbmap us

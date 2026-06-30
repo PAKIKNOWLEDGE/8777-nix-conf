@@ -175,6 +175,7 @@ home-manager switch
     fastfetch                   # 系统信息
     tree                        # 树状图显示目录
     hyfetch                     # 彩色系统信息（xfce4-terminal 专用\无图像协议terminal方案）
+    wifitui                     # 更好的nmtui替代
 
     # ── 网络工具 ──
     git                         # 饭桶 

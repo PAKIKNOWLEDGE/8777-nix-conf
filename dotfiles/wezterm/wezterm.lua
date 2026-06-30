@@ -56,7 +56,8 @@ return {
 	-- -------------------- 字体设置 --------------------
 	font = wezterm.font_with_fallback({
 		"JetBrainsMonoNL Nerd Font Mono",
-		"Noto Sans CJK SC"
+		"Sarasa Term SC",
+		"Noto Sans CJK SC",
 	}),
 
 	-- -------------------- 键盘快捷键 --------------------
