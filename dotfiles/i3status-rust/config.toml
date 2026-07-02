@@ -1,6 +1,5 @@
 [theme]
 theme = "native"
-overrides = { spacing = 0 }
 
 [icons]
 icons = "material-nf"
@@ -18,8 +17,6 @@ device = "^en"
 
 [[block]]
 block = "sound"
-format = "$icon $volume"
-device = "pulse"
 
 [[block]]
 block = "cpu"

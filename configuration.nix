@@ -211,6 +211,7 @@ home-manager switch
     wezterm                     # 终端模拟器
     starship                    # 提示符
     fish                        # 哦哦。
+    alacritty                   # 🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀  
 
     # ── 编辑器 ──
     neovim                      # lazy
