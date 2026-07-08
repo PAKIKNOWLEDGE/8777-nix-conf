@@ -23,6 +23,7 @@
     libreoffice   # 办公套件 这吊货编译了12分钟
     sarasa-gothic # 更纱黑体
     gimp #adobe?
+    macchina
   ];
 
   # HM 自身需要启用才能正常工作

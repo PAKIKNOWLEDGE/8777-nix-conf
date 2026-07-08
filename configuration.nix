@@ -169,12 +169,13 @@ home-manager switch
     lazygit                     # TUI Git 客户端
     zoxide                      # 智能 cd
     yazi                        # TUI 文件管理器
-
     btop                        # 任务管理器（对 terminal 渲染有要求）
     htop                        # 任务管理器基础版
     fastfetch                   # 系统信息
     tree                        # 树状图显示目录
-    hyfetch                     # 彩色系统信息（xfce4-terminal 专用\无图像协议terminal方案）
+    hyfetch                     # 彩色系统信息（无图像协议terminal方案）
+                                # 这货硬编码了.config/eve-ascii.txt 需要在json里
+                                # 手动调整一下
     wifitui                     # 更好的nmtui替代
 
     # ── 网络工具 ──

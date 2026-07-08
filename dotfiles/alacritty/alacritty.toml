@@ -1,10 +1,37 @@
-# 窗口设置
 [window]
-opacity = 0.65
-padding = { x = 5, y = 5 }
+opacity=0.95
+[window.padding]
+y = 2  
+x = 2
+
 [font]
-size = 15
-[font.normal]
-family = "JetBrainsMonoNL Nerd Font Mono"   # 只写一个主字体
-[colors]
-primary = { background = "#1e1e2e", foreground = "#cdd6f4" }
+normal = { family = "JetBrainsMono Nerd Font Propo", style = "Regular" }
+# size = 20
+size = 13
+
+
+[colors.bright]
+black   = "#444b6a"
+blue    = "#7da6ff"
+cyan    = "#0db9d7"
+green   = "#b9f27c"
+magenta = "#bb9af7"
+red     = "#ff7a93"
+white   = "#acb0d0"
+yellow  = "#ff9e64"
+
+
+[colors.primary]
+background = "#1a1b26"
+foreground = "#c0caf5"
+
+[colors.normal]
+black   = "#15161e"
+red     = "#f7768e"
+green   = "#9ece6a"
+yellow  = "#e0af68"
+blue    = "#7aa2f7"
+magenta = "#bb9af7"
+cyan    = "#7dcfff"
+white   = "#a9b1d6"
+
