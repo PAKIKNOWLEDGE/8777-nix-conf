@@ -22,8 +22,10 @@
   */
     libreoffice   # 办公套件 这吊货编译了12分钟
     sarasa-gothic # 更纱黑体
-    gimp #adobe?
+    gimp # adobe?
     macchina
+    vis # 啊哈哈 目前暂时不知道这货和vim比起来有啥用
+    vim # 巧了吗这不是
   ];
 
   # HM 自身需要启用才能正常工作

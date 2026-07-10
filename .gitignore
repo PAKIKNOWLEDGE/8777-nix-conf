@@ -1,2 +1,3 @@
-# 硬件配置自动生成，每台机器不同，不要进仓库
-hardware-configuration.nix
+# 旧 hardware-configuration.nix 已迁移到 hosts/<machine>/hardware.nix
+# 硬件配置无敏感信息，flake 需要 git 跟踪，正常提交即可
+# 每台机器的 hardware.nix 在自己对应主机的目录里生成

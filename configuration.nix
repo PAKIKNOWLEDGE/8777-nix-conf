@@ -30,9 +30,8 @@ home-manager switch
   # configuration.nix 不是"一个文件描述整个系统"，而是"一个入口文件，import 其他模块"
   # 每个 import 的文件都可以声明 boot、services、environment 等选项
   # NixOS 在构建时把所有这些声明合并成一个系统
-  imports =
-    [ ./hardware-configuration.nix   # 硬件配置（自动生成，不变） 在迁移时，此部分是不可共通的
-    ];
+  # 主机差异配置由 hosts/<machine>/ 提供，此处仅保留公共导入
+  imports = [ ];
 
   # ----- 引导程序 -----
   # 使用 systemd-boot 作为 UEFI 引导管理器。
@@ -43,8 +42,6 @@ home-manager switch
   boot.loader.systemd-boot.configurationLimit = 5;
 
   # ----- 网络 -----
-  # 设置主机名。
-  networking.hostName = "K1llingMyL0v3";
   # 启用 NetworkManager
   networking.networkmanager.enable = true;
 
