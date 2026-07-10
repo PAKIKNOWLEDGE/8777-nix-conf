@@ -1,11 +1,17 @@
 { ... }: {
   networking.hostName = "NewPC";
+  imports = [ ./hardware.nix ];
 
-  # 占位：等新机器到了 nixos-generate-config 生成后替换
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/CHANGE-ME";
-    fsType = "ext4";
-  };
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # ── 等你新机器到了，差异配置写这里 ──
+
+  # 硬件相关（触控板、独显等）
+  # services.libinput.enable = false;
+  # hardware.graphics.enable = true;
+
+  # 想换 Hyprland？
+  # programs.hyprland.enable = true;
+  # environment.systemPackages = with pkgs; [ waybar wofi ... ];
+
+  # 不想用 i3 了？
+  # services.xserver.windowManager.i3.enable = false;
 }
