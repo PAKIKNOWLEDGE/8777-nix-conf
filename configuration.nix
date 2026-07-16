@@ -171,8 +171,8 @@ home-manager switch
     fastfetch                   # 系统信息
     tree                        # 树状图显示目录
     hyfetch                     # 彩色系统信息（无图像协议terminal方案）
-                                # 这货硬编码了.config/eve-ascii.txt 需要在json里
-                                # 手动调整一下
+                                # 这货硬编码了.config/eve-ascii.txt 需要在json里 手动调整一下
+                               
     wifitui                     # 更好的nmtui替代
 
     # ── 网络工具 ──
@@ -320,6 +320,8 @@ home-manager switch
                                                                # note2:要用包裹式的override写法
 
       fcitx5-gtk                         # GTK 程序支持
+      rime-data
+      qt6Packages.fcitx5-chinese-addons
       qt6Packages.fcitx5-configtool      # 图形化配置工具
     ];
   };

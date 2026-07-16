@@ -18,11 +18,11 @@
           ./hosts/ThinkPadX250
         ];
       };
-      NewPC = nixpkgs.lib.nixosSystem {
+      Pain = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
-          ./hosts/NewPC
+          ./hosts/Pain
         ];
       };
     };
