@@ -316,12 +316,8 @@ home-manager switch
     enable = true;
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
-      (fcitx5-rime.override { rimeDataPkgs = [ rime-ice ]; })  # Rime + 雾凇拼音 
-                                                               # note2:要用包裹式的override写法
-
       fcitx5-gtk                         # GTK 程序支持
-      rime-data
-      qt6Packages.fcitx5-chinese-addons
+      qt6Packages.fcitx5-chinese-addons   # 拼音 + cloudpinyin（百度/谷歌云词库）
       qt6Packages.fcitx5-configtool      # 图形化配置工具
     ];
   };

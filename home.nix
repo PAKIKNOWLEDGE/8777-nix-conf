@@ -28,6 +28,14 @@
     vim # 巧了吗这不是
   ];
 
+  programs.bash = {
+    enable = true;
+    initExtra = ''
+      export STARSHIP_CONFIG=~/.config/starship-bash.toml
+      eval "$(starship init bash)"
+    '';
+  };
+
   # HM 自身需要启用才能正常工作
   programs.home-manager.enable = true;
 }
