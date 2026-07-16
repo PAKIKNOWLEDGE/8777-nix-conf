@@ -1,1 +1,2 @@
-export PATH="$HOME/.npm-global/bin:$PATH"
+export STARSHIP_CONFIG=~/.config/starship-bash.toml
+eval "$(starship init bash)"
