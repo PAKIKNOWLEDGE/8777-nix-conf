@@ -1,5 +1,5 @@
 { config, pkgs, ... }: {
-  networking.hostName = "PainkyCrush";
+  networking.hostName = "pain";
   imports = [ ./hardware.nix ];
   environment.systemPackages = with pkgs; [
     macchina                           # hyfetch用的
