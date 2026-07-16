@@ -27,6 +27,7 @@ set fish_greeting ""
 set -p PATH ~/.local/bin ~/.cargo/bin ~/.npm-global/bin
 
 # starship 提示符
+set -x STARSHIP_CONFIG ~/.config/starship-fish.toml
 starship init fish | source
 # zoxide 智能跳转
 zoxide init fish --cmd cd | source

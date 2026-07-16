@@ -16,4 +16,6 @@ configuration {
 	disable-history: false;
 }
 
-@theme "/nix/store/f6jj0h6nn40cv8hq7ksgikx04vayxjlw-rofi-2.0.0/share/rofi/themes/material.rasi"
+//@theme "/nix/store/f6jj0h6nn40cv8hq7ksgikx04vayxjlw-rofi-2.0.0/share/rofi/themes/material.rasi"
+
+@theme "/nix/store/smag1avi30y14xhc4k631hpkr4ypx6dw-rofi-2.0.0/share/rofi/themes/material.rasi"
