@@ -3,7 +3,4 @@
 # 每台机器的 hardware.nix 在自己对应主机的目录里生成
 .mimocode
 
-# nvim
-lazy-lock.json
-generated.lua
 
