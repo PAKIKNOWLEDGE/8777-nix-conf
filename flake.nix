@@ -1,6 +1,15 @@
 {
   description = "PAKI KNOWLEDGE NixOS Configuration";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://mirrors.ustc.edu.cn/nix-channels/store"
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
+      "https://mirror.sjtu.edu.cn/nix-channels/store"
+      "https://mirrors.nju.edu.cn/nix-channels/store"
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-25-11.url = "github:NixOS/nixpkgs/nixos-25.11";

@@ -9,10 +9,9 @@ sudo mv /etc/nixos/ ~/nix/            # 原始配置搬家到 ~/nix/nixos/
 sudo ln -s ~/nix/nixos /etc/nixos     # 软链占位，让系统能找到
 请注意，此时 /etc/nixos 指向 ~/nix/nixos/，里面的文件还是新机器默认生成的。
 切记：hardware-configuration.nix是每台机器独一无二的 仓库里也不会跟踪。
-这之后，进行系统源的配置：
-  # 首次装机后还需执行一次（让 nixpkgs 源码也从 USTC 走）：
-  #   sudo nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05 nixos
-  #   sudo nix-channel --update
+这之后，装机时指定国内镜像再构建：
+  sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
+    --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
 然后，可以构建系统的雏形。
 这之后，进行HM层面的构建。
 mkdir -p ~/.config/home-manager
@@ -125,6 +124,7 @@ home-manager switch
   # 字体注册到 fontconfig，GUI 程序才能找到
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
+    sarasa-gothic # 更纱黑体
   ];
 
   # 启用 Firefox（使用 NixOS 的“程序模块”方式安装，会自动处理浏览器配置）。
@@ -284,16 +284,19 @@ home-manager switch
   # 使用中科大（USTC）镜像源
   nix.settings = {
     substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store"
+      "https://mirrors.ustc.edu.cn/nix-channels/store"         # USTC 中科大
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" # TUNA 清华
+      "https://mirror.sjtu.edu.cn/nix-channels/store"           # SJTU 上交
+      "https://mirrors.nju.edu.cn/nix-channels/store"           # NJU 南大
       "https://cache.nixos.org/"
     ];
     trusted-users = [ "root" "pakiknowledge" ];
     experimental-features = [ "nix-command" "flakes" ];
   };
 
-  # 首次装机后还需执行一次（让 nixpkgs 源码也从 USTC 走）：
-  #   sudo nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixos-26.05 nixos
-  #   sudo nix-channel --update
+  # 首次装机时指定国内镜像（避免从国外拉包卡死）：
+  #   sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
+  #     --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
 
   # 自动垃圾回收——每周清理 7 天前的旧 generation
   nix.gc = {
