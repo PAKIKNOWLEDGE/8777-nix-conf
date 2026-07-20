@@ -21,6 +21,17 @@
     vim # 巧了吗这不是
       ];
 
+  # ── Git ──
+  programs.git = {
+    enable = true;
+    settings = {
+      user.name = "PAKI KNOWLEDGE";
+      user.email = "PAKIKNOWLEDGE@users.noreply.github.com";
+      credential.helper = "!gh auth git-credential";  # 不写死 store path，gh 更新后不会炸
+      core.editor = "nvim";
+    };
+  };
+
   programs.bash = {
     enable = true;
     initExtra = ''
