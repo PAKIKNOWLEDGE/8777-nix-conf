@@ -3,6 +3,7 @@
   imports = [ ./hardware.nix ];
   environment.systemPackages = with pkgs; [
     helix
+    tlp
   ];
 
 

@@ -19,8 +19,6 @@
     macchina
     vis # 啊哈哈 目前暂时不知道这货和vim比起来有啥用
     vim # 巧了吗这不是
-    lapce
-    zed-editor
       ];
 
   programs.bash = {
