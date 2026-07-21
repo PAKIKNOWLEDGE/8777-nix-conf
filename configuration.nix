@@ -3,23 +3,22 @@
 # （可通过运行 ‘nixos-help’ 访问）。
 
 /*
-写在前面：你需要做的——将nix配置纳入非sudo管理
-mkdir -p ~/nix
-sudo mv /etc/nixos/ ~/nix/            # 原始配置搬家到 ~/nix/nixos/
-sudo ln -s ~/nix/nixos /etc/nixos     # 软链占位，让系统能找到
-请注意，此时 /etc/nixos 指向 ~/nix/nixos/，里面的文件还是新机器默认生成的。
-切记：hardware-configuration.nix是每台机器独一无二的 仓库里也不会跟踪。
-这之后，装机时指定国内镜像再构建：
-  sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
-    --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
-然后，可以构建系统的雏形。
-这之后，进行HM层面的构建。
-mkdir -p ~/.config/home-manager
-ln -sf /etc/nixos/home.nix ~/.config/home-manager/home.nix
-home-manager switch
-2026-06-25：此时，HM“仅”为了解决krita和onlyoffice这两个巨无霸。以后，会慢慢迭代，让更多的
-包也流入进HM管理的层面。
-
+  写在前面：你需要做的——将nix配置纳入非sudo管理
+  mkdir -p ~/nix
+  sudo mv /etc/nixos/ ~/nix/            # 原始配置搬家到 ~/nix/nixos/
+  sudo ln -s ~/nix/nixos /etc/nixos     # 软链占位，让系统能找到
+  请注意，此时 /etc/nixos 指向 ~/nix/nixos/，里面的文件还是新机器默认生成的。
+  切记：hardware-configuration.nix是每台机器独一无二的 仓库里也不会跟踪。
+  这之后，装机时指定国内镜像再构建：
+    sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
+      --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
+  然后，可以构建系统的雏形。
+  这之后，进行HM层面的构建。
+  mkdir -p ~/.config/home-manager
+  ln -sf /etc/nixos/home.nix ~/.config/home-manager/home.nix
+  home-manager switch
+  2026-06-25：此时，HM“仅”为了解决krita和onlyoffice这两个巨无霸。以后，会慢慢迭代，让更多的
+  包也流入进HM管理的层面。
 */
 { config, pkgs, ... }:
 
@@ -71,14 +70,12 @@ home-manager switch
   # ----- 图形界面和显示服务器 (X11) -----
   # 启用 X11 窗口系统。
   services.xserver.enable = true;
-
-  # 启用 XFCE 桌面环境
-  # LightDM → SDDM
-  services.displayManager.sddm.enable = true;              # 之前写错了（旧名 services.xserver.displayManager.sddm）
-  services.xserver.desktopManager.xfce.enable = true;     # XFCE
-  # i3  
+  # enable sddm
+  services.displayManager.sddm.enable = true;
+  # ↑之前写错了（旧名 services.xserver.displayManager.sddm）
+  services.xserver.desktopManager.xfce.enable = true; # XFCE
+  # i3
   services.xserver.windowManager.i3.enable = true;
-
   # 设置键盘布局为中文
   services.xserver.xkb = {
     layout = "cn";
@@ -99,26 +96,31 @@ home-manager switch
   # 启用 PipeWire（新一代音频/视频服务，推荐现代系统使用）。
   services.pipewire = {
     enable = true;
-    alsa.enable = true;          # 支持 ALSA 应用
-    alsa.support32Bit = true;    # 支持 32 位 ALSA 应用（游戏、旧软件）
-    pulse.enable = true;         # 兼容 PulseAudio 应用（向下兼容）
+    alsa.enable = true; # 支持 ALSA 应用
+    alsa.support32Bit = true; # 支持 32 位 ALSA 应用（游戏、旧软件）
+    pulse.enable = true; # 兼容 PulseAudio 应用（向下兼容）
     # jack.enable = true;        # 如果需要 JACK 专业音频应用，取消注释
     # media-session.enable = true; # 默认已启用，无需重复配置
   };
 
   # 触摸板支持（通常已在桌面环境中默认启用，此处保留可选项）。
   # 上面的，我用i3wm你不炸了吗
-  services.libinput.enable = true;       # 旧名 services.xserver.libinput
+  services.libinput.enable = true; # 旧名 services.xserver.libinput
 
   # ----- 用户账户 -----
   # 定义你的用户。
-  users.users."pakiknowledge" = {       # 注意：在迁移的时候这个地方非常重要！！
+  users.users."pakiknowledge" = {
+    # 注意：在迁移的时候这个地方非常重要！！
     # 如果用户名不一致了系统会broken。
-    isNormalUser = true;                # 普通用户，而非系统服务账户
-    description = "PAKI KNOWLEDGE";     # 我的全名
-    extraGroups = [ "networkmanager" "wheel" ]; # 加入这些组以获取网络管理和 sudo 权限
-                                                # 未来可能需要video组支持
-    shell = pkgs.fish;                  # 默认 shell 设为 fish
+    isNormalUser = true; # 普通用户，而非系统服务账户
+    description = "PAKI KNOWLEDGE"; # 我的全名
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+    # 加入这些组以获取网络管理和 sudo 权限
+    # 未来可能需要video组支持
+    shell = pkgs.fish; # 默认 shell 设为 fish
   };
 
   # 字体注册到 fontconfig，GUI 程序才能找到
@@ -136,7 +138,7 @@ home-manager switch
   programs.dconf.enable = true;
 
   # 启用OpenGL驱动
-  hardware.graphics.enable = true; 
+  hardware.graphics.enable = true;
 
   # ----- 软件包管理 -----
   # 允许安装许可证不自由的软件包（如 Chrome、Nvidia 驱动等）。
@@ -151,112 +153,110 @@ home-manager switch
   # note1:在nix语言中，列表构造优先级竟然是高于函数对，这太可怕了
   # 然而更恐怖的是 如果不适用括号 列表会认为它接受了两个元素
   /*
-  2026-06-25： 本配置正在进行重构。一些太大的包，例如需要拉下庞大Qt库的krita，
-  和onlyoffice等，统一在home.nix中管理。为何这样做？这是为了方便更快的构建
-  系统的雏形。以后，一些非必要的包，也会移动入home.nix.
+    2026-06-25： 本配置正在进行重构。一些太大的包，例如需要拉下庞大Qt库的krita，
+    和onlyoffice等，统一在home.nix中管理。为何这样做？这是为了方便更快的构建
+    系统的雏形。以后，一些非必要的包，也会移动入home.nix.
   */
 
   environment.systemPackages = with pkgs; [
     # ── 日常 CLI ──
-    bat                         # 轻量级 cat 替代
-    ripgrep                     # 快速 grep 替代
-    fd                          # 友好版 find
-    fzf                         # 模糊搜索 此外 fzf为被仓库的sync脚本依赖
-    eza                         # ls 替代
-    lazygit                     # TUI Git 客户端
-    zoxide                      # 智能 cd
-    yazi                        # TUI 文件管理器
-    btop                        # 任务管理器（对 terminal 渲染有要求）
-    htop                        # 任务管理器基础版
-    fastfetch                   # 系统信息
-    tree                        # 树状图显示目录
-    hyfetch                     # 彩色系统信息（无图像协议terminal方案）
-                                # 这货硬编码了.config/eve-ascii.txt 需要在json里 手动调整一下
-                               
-    wifitui                     # 更好的nmtui替代
+    bat # 轻量级 cat 替代
+    ripgrep # 快速 grep 替代
+    fd # 友好版 find
+    fzf # 模糊搜索 此外 fzf为被仓库的sync脚本依赖
+    eza # ls 替代
+    lazygit # TUI Git 客户端
+    zoxide # 智能 cd
+    yazi # TUI 文件管理器
+    btop # 任务管理器（对 terminal 渲染有要求）
+    htop # 任务管理器基础版
+    fastfetch # 系统信息
+    tree # 树状图显示目录
+    hyfetch
+    # 彩色系统信息（无图像协议terminal方案）
+    # 这货硬编码了.config/eve-ascii.txt 需要在json里 手动调整一下
+
+    wifitui # 更好的nmtui替代
 
     # ── 网络工具 ──
-    git                         # 饭桶 
-    wget                        # 迅雷下载破解版
-    curl                        # 迅雷下载无敌版
-    gh                          # GitHub CLI
+    git # 饭桶
+    wget # 迅雷下载破解版
+    curl # 迅雷下载无敌版
+    gh # GitHub CLI
 
     # ── 开发 ──
-    nodejs                      # agent 启动
-    gcc                         # nvim-treesitter 编译 parser
-    tree-sitter                 # nvim-treesitter 编译 CLI
+    nodejs # agent 启动
+    gcc # nvim-treesitter 编译 parser
+    tree-sitter # nvim-treesitter 编译 CLI
 
     # ── i3 生态 ──
-    rofi                        # 启动器
-    picom                       # 窗口合成器（透明/阴影）
-    dunst                       # 通知守护进程
-    nitrogen                    # 壁纸设置
-    flameshot                   # 截图工具
-    xautolock                   # 自劢锁屏
-    maim                        # 截图（命令行）
-    i3lock                      # 锁屏
-    xclip                       # 剪贴板
-    i3status-rust               # 个人认为 i3status比较乏力 请farris帮个忙吧🦀
-    pulseaudio          # 提供 pactl FN+fx 
-    brightnessctl       # 提供 brightnessctl FN+fx 
+    rofi # 启动器
+    picom # 窗口合成器（透明/阴影）
+    dunst # 通知守护进程
+    nitrogen # 壁纸设置
+    flameshot # 截图工具
+    xautolock # 自劢锁屏
+    maim # 截图（命令行）
+    i3lock # 锁屏
+    xclip # 剪贴板
+    i3status-rust # 个人认为 i3status比较乏力 请farris帮个忙吧🦀
+    pulseaudio # 提供 pactl FN+fx
+    brightnessctl # 提供 brightnessctl FN+fx
 
     # ── 主题/外观 ──
-    colloid-gtk-theme           # GTK 主题
-    papirus-icon-theme          # 图标主题
+    colloid-gtk-theme # GTK 主题
+    papirus-icon-theme # 图标主题
     # 不要用lxappearance 这在nix上不起作用
 
     # ── 终端 ──
-    wezterm                     # 终端模拟器
-    starship                    # 提示符
-    fish                        # 哦哦。
-    alacritty                   # 🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀  
+    wezterm # 终端模拟器
+    starship # 提示符
+    fish # 哦哦。
+    alacritty # 🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀
 
     # ── 编辑器 ──
-    neovim                      # lazy
-    kdePackages.kate            # 挚爱
+    neovim # lazy
+    kdePackages.kate # 挚爱
 
     # ── Design ──
-    matugen   # MaterialYou有没有懂的
-    papers    # PDF reader 
+    matugen # MaterialYou有没有懂的
+    papers # PDF reader
     hugo
 
     # ── 工具 ──
-    unzip                       # 360一键压缩破解版
-    clash-verge-rev             # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
-    go-musicfox                 # 网易云音乐 TUI
-    haskellPackages.greenclip   # 剪贴板管理器
-    simplescreenrecorder        # x11录屏 
+    unzip # 360一键压缩破解版
+    clash-verge-rev # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
+    go-musicfox # 网易云音乐 TUI
+    haskellPackages.greenclip # 剪贴板管理器
+    simplescreenrecorder # x11录屏
 
     # ── Home Manager ──
-    home-manager                # 用户级包管理器工具
+    home-manager # 用户级包管理器工具
 
   ];
-
 
   /*
-  nix-ld 是 NixOS 提供的一个特殊的动态链接器加载器（或者说是一个兼容层）。
-  它的核心作用是：在 NixOS 系统上，为那些“预期在标准 Linux 环境（FHS）下运行”的动态链接程序，
-  提供一个模拟的标准库路径（比如 /lib、/usr/lib）。
-  当这样的程序运行时，nix-ld 会拦截它查找动态库的请求，并根据你的配置,
-  在 /nix/store 中找到对应的库文件提供给程序使用。
-  ld与pkg必须共存，可以说，ld是针对pkg的额外配置。
-  pkg的声明会将系统包置入系统，而ld为pkg提供了更进一步的动态链接索引。
-  此问题在配置AstrVim、LazyVim的某些插件时出现。没有配置ld会直接导致插件down掉。
-  */ 
+    nix-ld 是 NixOS 提供的一个特殊的动态链接器加载器（或者说是一个兼容层）。
+    它的核心作用是：在 NixOS 系统上，为那些“预期在标准 Linux 环境（FHS）下运行”的动态链接程序，
+    提供一个模拟的标准库路径（比如 /lib、/usr/lib）。
+    当这样的程序运行时，nix-ld 会拦截它查找动态库的请求，并根据你的配置,
+    在 /nix/store 中找到对应的库文件提供给程序使用。
+    ld与pkg必须共存，可以说，ld是针对pkg的额外配置。
+    pkg的声明会将系统包置入系统，而ld为pkg提供了更进一步的动态链接索引。
+    此问题在配置AstrVim、LazyVim的某些插件时出现。没有配置ld会直接导致插件down掉。
+  */
 
   programs.nix-ld = {
-  enable = true;
-  libraries = with pkgs; [
-    # 添加 tree-sitter 及其可能依赖的库
-    tree-sitter
-    stdenv.cc.cc.lib
-    glib
-    zlib
-    # 如果后续还有其他库缺失的报错，可以在这里继续追加
-  ];
-};
-
-
+    enable = true;
+    libraries = with pkgs; [
+      # 添加 tree-sitter 及其可能依赖的库
+      tree-sitter
+      stdenv.cc.cc.lib
+      glib
+      zlib
+      # 如果后续还有其他库缺失的报错，可以在这里继续追加
+    ];
+  };
 
   # ----- 可选程序配置（需要额外配置的服务）-----
   # programs.mtr.enable = true;           # 网络诊断工具
@@ -267,12 +267,12 @@ home-manager switch
 
   # ----- 系统服务 -----
   # services.openssh.enable = true;       # 启用 OpenSSH 远程访问服务
-    services.libinput.touchpad.tappingDragLock = false; # 你们知道触控板轻触误触多恶心吗
+  services.libinput.touchpad.tappingDragLock = false; # 你们知道触控板轻触误触多恶心吗
 
   # ----- 防火墙 -----
   # networking.firewall.allowedTCPPorts = [ ... ];   # 开放指定 TCP 端口
   # networking.firewall.allowedUDPPorts = [ ... ];   # 开放指定 UDP 端口
-  networking.firewall.enable = false;                # 关了，被这玩意儿恶心太多次了
+  networking.firewall.enable = false; # 关了，被这玩意儿恶心太多次了
 
   # ----- 系统状态版本 -----
   # 此值决定了首次安装此系统时，状态数据（如文件位置、数据库版本）的默认设置。
@@ -284,14 +284,20 @@ home-manager switch
   # 使用中科大（USTC）镜像源
   nix.settings = {
     substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store"         # USTC 中科大
+      "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC 中科大
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" # TUNA 清华
-      "https://mirror.sjtu.edu.cn/nix-channels/store"           # SJTU 上交
-      "https://mirrors.nju.edu.cn/nix-channels/store"           # NJU 南大
+      "https://mirror.sjtu.edu.cn/nix-channels/store" # SJTU 上交
+      "https://mirrors.nju.edu.cn/nix-channels/store" # NJU 南大
       "https://cache.nixos.org/"
     ];
-    trusted-users = [ "root" "pakiknowledge" ];
-    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [
+      "root"
+      "pakiknowledge"
+    ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
 
   # 首次装机时指定国内镜像（避免从国外拉包卡死）：
@@ -319,10 +325,9 @@ home-manager switch
     enable = true;
     type = "fcitx5";
     fcitx5.addons = with pkgs; [
-      fcitx5-gtk                         # GTK 程序支持
-      qt6Packages.fcitx5-chinese-addons   # 拼音 + cloudpinyin（百度/谷歌云词库）
-      qt6Packages.fcitx5-configtool      # 图形化配置工具
+      fcitx5-gtk # GTK 程序支持
+      qt6Packages.fcitx5-chinese-addons # 拼音 + cloudpinyin（百度/谷歌云词库）
+      qt6Packages.fcitx5-configtool # 图形化配置工具
     ];
   };
 }
-
