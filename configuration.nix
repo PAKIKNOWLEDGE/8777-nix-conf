@@ -189,6 +189,7 @@
     nodejs # agent 启动
     gcc # nvim-treesitter 编译 parser
     tree-sitter # nvim-treesitter 编译 CLI
+    ty # pyton LSP and.. 🦀🦀🦀
 
     # ── i3 生态 ──
     rofi # 启动器
