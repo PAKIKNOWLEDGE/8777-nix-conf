@@ -5,8 +5,6 @@
   environment.systemPackages = with pkgs; [
     macchina # hyfetch用的
     zed-editor
-    nil # for zed's LSP
-    nixd # 同上
   ];
 
   # VGA EDID 修复 — 显示器不发送 EDID，手动注入

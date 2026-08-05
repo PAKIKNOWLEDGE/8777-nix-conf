@@ -183,7 +183,8 @@
     wget # 迅雷下载破解版
     curl # 迅雷下载无敌版
     gh # GitHub CLI
-
+    nixd # for .nix file LSP support
+    nil # nix lsp yet another simple mode
     # ── 开发 ──
     nodejs # agent 启动
     gcc # nvim-treesitter 编译 parser
