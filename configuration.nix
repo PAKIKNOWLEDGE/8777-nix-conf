@@ -183,14 +183,15 @@
     wget # 迅雷下载破解版
     curl # 迅雷下载无敌版
     gh # GitHub CLI
-    nixd # for .nix file LSP support
-    nil # nix lsp yet another simple mode
-    # ── 开发 ──
+    
+       # ── 开发 ──
     nodejs # agent 启动
     gcc # nvim-treesitter 编译 parser
     tree-sitter # nvim-treesitter 编译 CLI
     ty # pyton LSP and.. 🦀🦀🦀
-
+    nixd # for .nix file LSP support
+    nil # nix lsp yet another simple mode
+    taplo # toml toolkit written in rust
     # ── i3 生态 ──
     rofi # 启动器
     picom # 窗口合成器（透明/阴影）
@@ -228,11 +229,13 @@
 
     # ── 工具 ──
     unzip # 360一键压缩破解版
-    clash-verge-rev # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
+    # clash-verge-rev # 哇，是魔法猫咪！₍ᐢ⑅•ᴗ•⑅ᐢ₎
+    flclash # a better proxy toolkit
     go-musicfox # 网易云音乐 TUI
     haskellPackages.greenclip # 剪贴板管理器
     simplescreenrecorder # x11录屏
-
+    mdwatch # 轻量预览
+    
     # ── Home Manager ──
     home-manager # 用户级包管理器工具
 

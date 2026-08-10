@@ -1,4 +1,5 @@
-theme = "tokyonight_moon"
+# theme config
+theme = "catppuccin_mocha"
 # ------------It's Vim area! ------------------
 [keys.normal]
 # Quick iteration on config changes
@@ -136,3 +137,10 @@ P = "paste_clipboard_before"
 
 # Escape the madness! No more fighting with the cursor! Or with multiple cursors!
 esc = ["collapse_selection", "keep_primary_selection", "normal_mode"]
+# from:https://github.com/LGUG2Z/helix-vim thanks this kind bro
+
+# a kind good cursor shape config: 
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
