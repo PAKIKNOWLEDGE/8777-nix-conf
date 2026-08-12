@@ -3,20 +3,22 @@
 # （可通过运行 ‘nixos-help’ 访问）。
 
 /*
-  写在前面：你需要做的——将nix配置纳入非sudo管理
-  mkdir -p ~/nix
-  sudo mv /etc/nixos/ ~/nix/            # 原始配置搬家到 ~/nix/nixos/
-  sudo ln -s ~/nix/nixos /etc/nixos     # 软链占位，让系统能找到
-  请注意，此时 /etc/nixos 指向 ~/nix/nixos/，里面的文件还是新机器默认生成的。
-  切记：hardware-configuration.nix是每台机器独一无二的 仓库里也不会跟踪。
-  这之后，装机时指定国内镜像再构建：
-    sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
+  写在前面：flake 不需要配置放在 /etc/nixos，"mv + ln -s" 那套是 channel 时代的旧习惯。
+  仓库克隆到任意位置即可构建，惯例放 ~/nix/nixos：
+    git clone <url> ~/nix/nixos
+  /etc/nixos 上可能残留新机默认生成的文件，那是没用的死文件，不影响本仓库。
+
+  构建（cd 进仓库，用 .# 指向当前 flake）：
+    cd ~/nix/nixos && sudo nixos-rebuild switch --flake .#ThinkPadX250
+  装机时指定国内镜像再构建：
+    sudo nixos-install --flake /路径/到/仓库#ThinkPadX250 \
       --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
-  然后，可以构建系统的雏形。
-  这之后，进行HM层面的构建。
-  mkdir -p ~/.config/home-manager
-  ln -sf /etc/nixos/home.nix ~/.config/home-manager/home.nix
-  home-manager switch
+
+  切记：hardware-configuration.nix 是每台机器独一无二的，仓库里不跟踪，放 hosts/<机器>/。
+
+  HM 层直接走 flake：
+    home-manager switch --flake ~/nix/nixos#pakiknowledge
+
   2026-06-25：此时，HM“仅”为了解决krita和onlyoffice这两个巨无霸。以后，会慢慢迭代，让更多的
   包也流入进HM管理的层面。
 */
@@ -307,7 +309,7 @@
   };
 
   # 首次装机时指定国内镜像（避免从国外拉包卡死）：
-  #   sudo nixos-install --flake /mnt/etc/nixos#ThinkPadX250 \
+  #   sudo nixos-install --flake /路径/到/仓库#ThinkPadX250 \
   #     --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
 
   # 自动垃圾回收——每周清理 7 天前的旧 generation
