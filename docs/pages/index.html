@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文档索引 · ~/nix/nixos</title>
+<meta name="description" content="NixOS + dotfiles 双主机仓库文档索引：新机器接入指南与 dotfiles 同步系统参考手册">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html" aria-current="page">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html">dotfiles 手册</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <p class="kicker">NixOS · dotfiles · 双主机仓库</p>
+  <h1>文档索引</h1>
+  <p class="lede">这套配置分两层，注意别搞混两套 <code>hosts/</code>：NixOS 系统层管“装什么”，dotfiles 配置层管“怎么配”。</p>
+</section>
+
+<div class="layers" aria-label="两层结构示意">
+  <div class="layers-col" style="flex:1">
+    <div class="layer layer-top">
+      <div class="layer-name"><span class="dot"></span>dotfiles 配置层</div>
+      <div class="layer-desc">应用配置 · common/ + hosts/&lt;host&gt;/ · rsync</div>
+    </div>
+  </div>
+  <div class="sync-rail">
+    <span class="rail-label">sync.sh</span>
+    <span class="rail-arrow">↓ 下发<br>↑ 回写</span>
+  </div>
+  <div class="layers-col" style="flex:1">
+    <div class="layer layer-bot">
+      <div class="layer-name"><span class="dot"></span>NixOS 系统层</div>
+      <div class="layer-desc">软件 / 服务 · hosts/&lt;Host&gt;/ · flake 构建</div>
+    </div>
+  </div>
+</div>
+
+<div class="fleet" aria-label="受管机器">
+  <span class="fleet-label">受管机器</span>
+  <span class="chip"><span class="chip-code">pain</span><span class="chip-note">台式 · 无电池</span></span>
+  <span class="chip"><span class="chip-code">thinkpadx250</span><span class="chip-note">笔记本 · 双电池 BAT0/BAT1</span></span>
+</div>
+
+<main class="index-body">
+  <h2 class="quick-ref">文档</h2>
+  <div class="cards">
+    <a class="card" href="new-pc-guide.html">
+      <span class="card-tag">新机器接入 · 端到端流程</span>
+      <h2>新机器接入指南</h2>
+      <p>来一台新机器：系统层（NixOS）→ 配置层（dotfiles）两条线都要接。照着做就行。</p>
+      <span class="card-go">开始接入</span>
+    </a>
+    <a class="card" href="dotfiles-guide.html">
+      <span class="card-tag">同步系统 · 完整参考</span>
+      <h2>dotfiles 同步系统参考手册</h2>
+      <p>分层规则、sync.sh 全部命令、安全机制、排除清单、排障。</p>
+      <span class="card-go">查阅手册</span>
+    </a>
+  </div>
+
+  <h2 class="quick-ref">快速对照</h2>
+  <div class="cards">
+    <div class="card" style="cursor:default">
+      <span class="card-tag">系统层</span>
+      <h2>哪台机器装什么软件 / 服务</h2>
+      <p>→ <code>hosts/&lt;Host&gt;/</code>（NixOS，走 flake 构建）</p>
+    </div>
+    <div class="card" style="cursor:default">
+      <span class="card-tag">配置层</span>
+      <h2>哪台机器的 dotfile 不同</h2>
+      <p>→ <code>dotfiles/hosts/&lt;host&gt;/</code>（rsync，走 <code>sync.sh</code>）</p>
+    </div>
+  </div>
+
+  <div class="callout alert">
+    <span class="ca-label">两层都要求</span>
+    <p><strong>新机器必留占位符</strong>：NixOS 侧建目录，dotfiles 侧跑 <code>sync.sh init-host</code>。</p>
+  </div>
+
+  <div class="table-wrap" style="margin-top:28px">
+    <table>
+      <thead>
+        <tr><th>仓库结构</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>hosts/&lt;Host&gt;/</code></td><td>NixOS 系统层：每台机器的硬件/服务差异（代号习惯大写）</td></tr>
+        <tr><td><code>dotfiles/hosts/&lt;host&gt;/</code></td><td>dotfiles 配置层：每台机器的应用配置差异（代号习惯小写）</td></tr>
+        <tr><td><code>configuration.nix</code></td><td>NixOS 公共配置</td></tr>
+        <tr><td><code>home.nix</code></td><td>home-manager 用户级配置</td></tr>
+        <tr><td><code>flake.nix</code></td><td>入口：双主机 + HM</td></tr>
+        <tr><td><code>dotfiles/sync.sh</code></td><td>配置层同步入口</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cmd">
+    <div class="cmd-bar"><span class="cmd-tag">结构</span><span class="cmd-lang">仓库根</span><button class="cmd-copy" type="button">复制</button></div>
+    <pre><code><span class="pt">仓库根</span>
+├── hosts/&lt;Host&gt;/            <span class="cm">NixOS 系统层: 每台机器的硬件/服务差异 (代号习惯大写)</span>
+├── dotfiles/hosts/&lt;host&gt;/   <span class="cm">dotfiles 配置层: 每台机器的应用配置差异 (代号习惯小写)</span>
+├── configuration.nix        <span class="cm">NixOS 公共配置</span>
+├── home.nix                 <span class="cm">home-manager 用户级配置</span>
+├── flake.nix                <span class="cm">入口: 双主机 + HM</span>
+└── dotfiles/sync.sh         <span class="cm">配置层同步入口</span></code></pre>
+  </div>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>文档 · 索引</span>
+  <span><a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dotfiles 同步系统参考手册 · ~/nix/nixos</title>
+<meta name="description" content="dotfiles 同步系统完整参考：分层规则、sync.sh 全部命令、安全机制、排除清单、排障">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html" aria-current="page">dotfiles 手册</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <aside class="toc" aria-label="本页目录">
+    <h4>本页目录</h4>
+    <ol>
+      <li><a href="#d-design">设计思想</a></li>
+      <li><a href="#d-tree">目录结构</a></li>
+      <li><a href="#d-layers">分层规则</a></li>
+      <li><a href="#d-writeback">回写归属规则</a></li>
+      <li><a href="#d-cmds">sync.sh 命令参考</a></li>
+      <li><a href="#d-host">主机识别</a></li>
+      <li><a href="#d-safety">安全机制</a></li>
+      <li><a href="#d-exclude">排除清单（EXCLUDE）</a></li>
+      <li><a href="#d-scenes">场景</a></li>
+      <li><a href="#d-trouble">排障</a></li>
+      <li><a href="#d-notes">注意事项</a></li>
+    </ol>
+  </aside>
+
+  <details class="toc-mobile">
+    <summary>目录</summary>
+    <ol>
+      <li><a href="#d-design">设计思想</a></li>
+      <li><a href="#d-tree">目录结构</a></li>
+      <li><a href="#d-layers">分层规则</a></li>
+      <li><a href="#d-writeback">回写归属规则</a></li>
+      <li><a href="#d-cmds">sync.sh 命令参考</a></li>
+      <li><a href="#d-host">主机识别</a></li>
+      <li><a href="#d-safety">安全机制</a></li>
+      <li><a href="#d-exclude">排除清单（EXCLUDE）</a></li>
+      <li><a href="#d-scenes">场景</a></li>
+      <li><a href="#d-trouble">排障</a></li>
+      <li><a href="#d-notes">注意事项</a></li>
+    </ol>
+  </details>
+
+  <article class="doc">
+    <h1>dotfiles 同步系统参考手册</h1>
+    <p class="lede"><code>dotfiles/</code> 是仓库里的一个“配置仓库”，用 <code>dotfiles/sync.sh</code> 在仓库和每台机器的 <code>~/.config/</code> 之间同步。<br>
+    新机器流程看 <a href="new-pc-guide.html">new-pc-guide.md</a>，这里是命令、规则和机制的完整参考。</p>
+
+    <h2 id="d-design">设计思想</h2>
+    <ul>
+      <li><strong>分层</strong>：<code>common/</code> 是所有机器共用的基线，<code>hosts/&lt;host&gt;/</code> 是单台机器的覆盖层。</li>
+      <li><strong>一个应用只归一层</strong>：host 层里出现的应用<strong>整体替换</strong> common 里同名应用。</li>
+      <li><strong>每台机器都有占位符</strong>：<code>hosts/&lt;host&gt;/.gitkeep</code>，无论有没有专属配置。</li>
+      <li><strong>命令式同步</strong>：不是 home-manager 那种声明式。改配置 → <code>sync</code> 回写仓库 → commit；仓库 → <code>deploy</code> 下发。</li>
+    </ul>
+
+    <h2 id="d-tree">目录结构</h2>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">结构</span><span class="cmd-lang">dotfiles/</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="pt">dotfiles/</span>
+├── sync.sh                  <span class="cm"># 唯一入口</span>
+├── common/                  <span class="cm"># 所有主机共用</span>
+│   ├── nvim/
+│   ├── fish/
+│   ├── i3/
+│   └── …
+└── hosts/
+    ├── <span class="hl">pain/</span>                <span class="cm"># pain: 占位符 + i3status-rust/ (无电池)</span>
+    │   ├── .gitkeep
+    │   └── i3status-rust/
+    └── <span class="hl">thinkpadx250/</span>        <span class="cm"># 笔记本: 占位符 + i3status-rust/ (双电池 BAT0/BAT1)</span>
+        ├── .gitkeep
+        └── i3status-rust/</code></pre>
+    </div>
+    <div class="callout">
+      <span class="ca-label">说明</span>
+      <p><code>.gitkeep</code> 只是让 git 追踪空目录的占位符，脚本会忽略它，不会当成应用同步。</p>
+    </div>
+
+    <h2 id="d-layers">分层规则</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>情况</th><th>放哪</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>所有机器配置一样</td><td><code>common/&lt;app&gt;/</code></td></tr>
+          <tr><td>只有某台机器不同</td><td><code>dotfiles/hosts/&lt;那个host&gt;/&lt;app&gt;/</code></td></tr>
+          <tr><td>host 与 common 同名应用</td><td>host 层<strong>整体覆盖</strong> common</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="ca-label">判断口诀</span>
+      <p><strong>这台机器跟别人一样 → common；不一样 → 它自己的 hosts 目录。</strong></p>
+    </div>
+
+    <h2 id="d-writeback">回写归属规则</h2>
+    <p><code>sync.sh sync</code>（本地 → 仓库）时：</p>
+    <ul>
+      <li>某应用在<strong>当前主机的 host 层</strong>存在 → 回写到 host 层</li>
+      <li>否则 → 回写到 common 层</li>
+    </ul>
+    <div class="callout">
+      <span class="ca-label">即</span>
+      <p><strong>host 层存在，host 层说了算。</strong></p>
+    </div>
+
+    <h2 id="d-cmds">sync.sh 命令参考</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>命令</th><th>作用</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>sync.sh deploy</code></td><td>仓库 → 本地</td><td>分层合并后预览，确认后部署</td></tr>
+          <tr><td><code>sync.sh deploy --yes</code></td><td>跳过确认</td><td>脚本/CI 用</td></tr>
+          <tr><td><code>sync.sh deploy --host X</code></td><td>指定主机</td><td>hostname 识别失败时用</td></tr>
+          <tr><td><code>sync.sh sync</code></td><td>本地 → 仓库</td><td>回写本机改动，按归属规则落位</td></tr>
+          <tr><td><code>sync.sh diff</code></td><td>只预览差异</td><td>不写任何文件</td></tr>
+          <tr><td><code>sync.sh list</code></td><td>列出托管应用</td><td>标 ✅/⚠ 本地是否有</td></tr>
+          <tr><td><code>sync.sh init-host &lt;代号&gt;</code></td><td>新机器占位符</td><td>建 <code>hosts/&lt;代号&gt;/.gitkeep</code></td></tr>
+          <tr><td><code>sync.sh fish-links</code></td><td>fish 便利链接</td><td><code>.fishrc</code> / <code>.fish_history</code></td></tr>
+          <tr><td><code>sync.sh help</code></td><td>帮助</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>兼容旧写法：<code>--deploy</code>/<code>--sync</code>/<code>--list</code> 等同 <code>deploy</code>/<code>sync</code>/<code>list</code>。</p>
+
+    <h3>例子</h3>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">示例</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="cm"># 本机部署（先看 diff 再确认）</span>
+dotfiles/sync.sh deploy
+
+<span class="cm"># 直接部署不啰嗦</span>
+dotfiles/sync.sh deploy --yes
+
+<span class="cm"># 给新机器建占位符</span>
+dotfiles/sync.sh init-host minipc
+
+<span class="cm"># 把本机改动存回仓库</span>
+dotfiles/sync.sh sync &amp;&amp; git add . &amp;&amp; git commit
+
+<span class="cm"># 只看看仓库和本地差什么</span>
+dotfiles/sync.sh diff
+
+<span class="cm"># 部署到别的机器（模拟）</span>
+dotfiles/sync.sh deploy --host thinkpadx250</code></pre>
+    </div>
+
+    <h2 id="d-host">主机识别</h2>
+    <p>识别顺序：</p>
+    <ol class="steps">
+      <li><code>--host X</code> 显式指定</li>
+      <li><code>hostname</code> → 查 <code>HOST_ALIASES</code> 映射</li>
+      <li><code>hosts/&lt;hostname&gt;</code> 直接命中</li>
+      <li>大小写不敏感兜底</li>
+      <li>都没有 → 提示“仅同步 common”，不报错</li>
+    </ol>
+    <p><code>HOST_ALIASES</code> 在脚本顶部：</p>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">配置</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="cm"># hostname 与目录名不一致时登记: "机器hostname:目录名"</span>
+HOST_ALIASES=(
+  "K1llingMyL0v3:thinkpadx250"
+)</code></pre>
+    </div>
+
+    <h2 id="d-safety">安全机制</h2>
+    <ol class="steps">
+      <li><strong><code>--delete</code> 只作用于托管应用</strong>：部署时对每个应用目录独立 <code>--delete</code>，绝不碰 <code>~/.config</code> 里未托管的配置。</li>
+      <li><strong>备份</strong>：被覆盖/删除的旧文件自动挪到 <code>~/.config/.dotfiles-backup/&lt;时间戳&gt;/</code>，不污染应用目录。</li>
+      <li><strong>回写不用 <code>--delete</code></strong>：<code>sync.sh sync</code> 不会从仓库删文件，安全。</li>
+      <li><strong>deploy 前强制预览</strong>：先 dry-run 展示差异，除非 <code>--yes</code>。</li>
+    </ol>
+
+    <h2 id="d-exclude">排除清单（EXCLUDE）</h2>
+    <p>脚本顶部只有一份：</p>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">排除</span><span class="cmd-lang">rsync 模式</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>.git, .gitkeep, *.bak, *.log, lazy-lock.json, generated.lua,
+completions/, conf.d/, functions/, __pycache__/</code></pre>
+    </div>
+    <p>这些是“生成的不该入库”的内容（nvim 的 lock、fish 自动生成的目录等）。<br>
+    要加排除项：只改脚本顶部一处，所有同步自动生效。</p>
+
+    <h2 id="d-scenes">场景</h2>
+
+    <h3>新加一台机器</h3>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">示例</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>sync.sh init-host &lt;代号&gt;     <span class="cm"># 占位符（必须）</span>
+sync.sh deploy               <span class="cm"># 部署公共配置</span>
+<span class="cm"># 有专属配置 → 放 hosts/&lt;代号&gt;/ 下再 deploy</span></code></pre>
+    </div>
+
+    <h3>把某个应用从 common 拆成按机器分</h3>
+    <ol class="steps">
+      <li>把 <code>common/&lt;app&gt;/</code> 移到目标机器的 <code>hosts/&lt;host&gt;/&lt;app&gt;/</code></li>
+      <li>其他机器想要各自版本 → 各自建 <code>hosts/&lt;host&gt;/&lt;app&gt;/</code></li>
+      <li>谁都不该共享 → 删掉 common 里那份</li>
+    </ol>
+
+    <h3>新机器装状态栏（i3status-rust 实例）</h3>
+    <ul>
+      <li>包在 <code>configuration.nix</code> 公共 <code>systemPackages</code>，NixOS 构建就有</li>
+      <li>配置按机器分：<code>hosts/pain/i3status-rust/</code>（无电池）vs <code>hosts/thinkpadx250/i3status-rust/</code>（双电池）</li>
+      <li>新机器照此建自己的 <code>hosts/&lt;代号&gt;/i3status-rust/</code></li>
+    </ul>
+
+    <h2 id="d-trouble">排障</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>现象</th><th>处理</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>deploy 提示“已是最新”但本地不对</td><td><code>sync.sh diff</code> 看差异；确认归属层放对</td></tr>
+          <tr><td>识别不到主机</td><td><code>--host X</code> 指定；或 <code>HOST_ALIASES</code> 加映射</td></tr>
+          <tr><td>覆盖后想后悔</td><td><code>~/.config/.dotfiles-backup/</code> 找时间戳备份</td></tr>
+          <tr><td>备份占满磁盘</td><td>删旧备份目录即可，不影响任何配置</td></tr>
+          <tr><td>一个应用出现在两个 host 层</td><td>归属规则让 host 层赢；把多余的挪走</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="d-notes">注意事项</h2>
+    <ul>
+      <li>这套是<strong>命令式</strong>同步，仓库是源。<code>sync</code> 回写后记得 commit，否则换机器拿不到。</li>
+      <li><code>deploy</code> 的预览是“相对当前主机的”，<code>--host X</code> 部署别台机器时先想清楚。</li>
+      <li>别让两台机器同时 <code>sync</code> 同一个 common 应用——冲突由你手动解决。</li>
+    </ul>
+  </article>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>文档 · dotfiles 同步系统参考手册</span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
