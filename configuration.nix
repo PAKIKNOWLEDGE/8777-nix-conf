@@ -220,7 +220,6 @@
     alacritty # 🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀🦀
 
     # ── 编辑器 ──
-    neovim # lazy
     kdePackages.kate # 挚爱
     helix # 你们知道吗 neovim除非使用nixvim否则在nix上几乎不可用
 
