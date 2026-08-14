@@ -19,6 +19,13 @@
     macchina
     vis # 啊哈哈 目前暂时不知道这货和vim比起来有啥用
     vim # 巧了吗这不是
+    gcc # nvim-treesitter 编译 parser
+    tree-sitter # nvim-treesitter 编译 CLI
+    ty # pyton LSP and.. 🦀🦀🦀
+    nixd # for .nix file LSP support
+    nil # nix lsp yet another simple mode
+    taplo # toml toolkit written in rust
+
          ];
 
   # ── Git ──

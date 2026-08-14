@@ -188,12 +188,9 @@
     
        # ── 开发 ──
     nodejs # agent 启动
-    gcc # nvim-treesitter 编译 parser
-    tree-sitter # nvim-treesitter 编译 CLI
-    ty # pyton LSP and.. 🦀🦀🦀
-    nixd # for .nix file LSP support
-    nil # nix lsp yet another simple mode
-    taplo # toml toolkit written in rust
+    python3 # 显式依赖层 这没办法了
+    uv # use rust to manager everything seems better 
+    
     # ── i3 生态 ──
     rofi # 启动器
     picom # 窗口合成器（透明/阴影）
