@@ -190,6 +190,8 @@
     nodejs # agent 启动
     python3 # 显式依赖层 这没办法了
     uv # use rust to manager everything seems better 
+    gnumake42
+    gcc
     
     # ── i3 生态 ──
     rofi # 启动器
