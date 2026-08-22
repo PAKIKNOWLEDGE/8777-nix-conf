@@ -144,3 +144,8 @@ esc = ["collapse_selection", "keep_primary_selection", "normal_mode"]
 insert = "bar"
 normal = "block"
 select = "underline"
+
+
+# 开启自动换行
+[editor.soft-wrap]
+enable = true
