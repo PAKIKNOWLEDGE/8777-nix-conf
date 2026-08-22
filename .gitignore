@@ -2,5 +2,7 @@
 # 硬件配置无敏感信息，flake 需要 git 跟踪，正常提交即可
 # 每台机器的 hardware.nix 在自己对应主机的目录里生成
 .mimocode
+# 运行日志不入库（btop.log 曾被误跟踪）
+dotfiles/common/btop/btop.log
 
 
