@@ -139,6 +139,33 @@ P = "paste_clipboard_before"
 esc = ["collapse_selection", "keep_primary_selection", "normal_mode"]
 # from:https://github.com/LGUG2Z/helix-vim thanks this kind bro
 
+[editor.statusline]
+left = [
+  "mode",
+  "spacer",
+  "version-control",
+  "spacer",
+  "separator",
+  "file-name",
+  "file-modification-indicator"
+]
+right = [
+  "spinner",
+  "spacer",
+  "workspace-diagnostics",
+  "separator",
+  "spacer",
+  "diagnostics",
+  "position",
+  "file-encoding",
+  "file-line-ending",
+  "file-type"
+]
+separator = "╎"
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
 # a kind good cursor shape config: 
 [editor.cursor-shape]
 insert = "bar"
