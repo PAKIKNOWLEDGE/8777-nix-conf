@@ -157,3 +157,6 @@ bar {
         separator #555555
     }
 }
+
+# 强制Flclash以平铺模式展开
+for_window [title="FlClash"] floating disable
