@@ -1,9 +1,10 @@
 #环境变量/nix
 set PATH $PATH /home/pakiknowledge/.local/bin
 set -gx PATH "$HOME/.nix-profile/bin" $PATH
-
-if status is-interactive
+# ===== Bun 全局包目录 =====
+fish_add_path "$HOME/.bun/bin"
     # ===== 代理开关（每次打开终端时询问） =====
+if status is-interactive
     if isatty stdin
         read -P '🔌 启用代理 (端口 7897)？ [y/N]: ' -l use_proxy
         switch $use_proxy
@@ -76,8 +77,8 @@ abbr reboot 'systemctl reboot'
 # 启动时显示系统信息（xfce4-terminal 内的 session 用 hyfetch 区别对待）
 set -l ppid (ps -p $fish_pid -o ppid= 2>/dev/null | string trim)
 set -l pname (ps -p $ppid -o comm= 2>/dev/null | string trim)
-if test "$pname" = ".xfce4-terminal"; or test "$pname" = "alacritty"
-hyfetch 2>/dev/null
+if test "$pname" = ".xfce4-terminal"; or test "$pname" = alacritty
+    hyfetch 2>/dev/null
 else
     fastfetch
 end

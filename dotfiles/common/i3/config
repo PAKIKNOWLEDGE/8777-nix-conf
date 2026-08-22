@@ -7,6 +7,34 @@ set $right l
 set $term wezterm
 set $menu rofi -show drun
 
+### Catppuccin Mocha
+set $rosewater #f5e0dc
+set $flamingo  #f2cdcd
+set $pink      #f5c2e7
+set $mauve     #cba6f7
+set $red       #f38ba8
+set $maroon    #eba0ac
+set $peach     #fab387
+set $yellow    #f9e2af
+set $green     #a6e3a1
+set $teal      #94e2d5
+set $sky       #89dceb
+set $sapphire  #74c7ec
+set $blue      #89b4fa
+set $lavender  #b4befe
+set $text      #cdd6f4
+set $subtext1  #bac2de
+set $subtext0  #a6adc8
+set $overlay2  #9399b2
+set $overlay1  #7f849c
+set $overlay0  #6c7086
+set $surface2  #585b70
+set $surface1  #45475a
+set $surface0  #313244
+set $base      #1e1e2e
+set $mantle    #181825
+set $crust     #11111b
+
 ### i3 必需
 font pango:JetBrainsMono Nerd Font, Sarasa UI SC 12
 
@@ -142,6 +170,15 @@ default_border pixel 2
 gaps inner 10
 gaps outer 5
 
+# Catppuccin Mocha 窗口配色
+#                    border     bg       text     indicator  border
+client.focused           $mauve    $mauve    $crust  $rosewater $mauve
+client.focused_inactive  $surface1 $surface1 $text   $rosewater $surface1
+client.unfocused         $surface0 $surface0 $text   $rosewater $surface0
+client.urgent            $peach    $peach    $base   $overlay0  $peach
+client.placeholder       $surface0 $surface0 $text   $overlay0  $surface0
+client.background        $base
+
 ### 状态栏
 bar {
     # 默认使用 i3status（轻量稳定）
@@ -152,9 +189,15 @@ bar {
     font pango:JetBrainsMono Nerd Font, Sarasa UI SC 12
     separator_symbol " │ "
     colors {
-        background #222222
-        statusline #ffffff
-        separator #555555
+        background         $base
+        statusline         $text
+        separator          $overlay0
+
+        #                  border    bg        text
+        focused_workspace  $base     $mauve    $crust
+        active_workspace   $base     $surface2 $text
+        inactive_workspace $base     $base     $text
+        urgent_workspace   $base     $red      $crust
     }
 }
 
