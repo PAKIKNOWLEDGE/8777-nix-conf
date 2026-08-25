@@ -41,6 +41,7 @@ alias rebuild='sudo nixos-rebuild switch'
 alias avim='nvim' # 肌肉记忆没救了
 alias homebuild='home-manager switch'
 alias ship='nix-shell -p updog --run "updog -d $(pwd)"'
+alias cl='clear'
 
 # yazi 退出后自动 cd 到浏览目录
 function y
