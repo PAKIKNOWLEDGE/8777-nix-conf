@@ -1,0 +1,159 @@
+window {
+    height: 600;
+    width: 600;
+    border: 1;
+    border-radius: 12;
+    border-color: #585b70;
+    background-color: #1e1e2e;
+    padding: 5;
+    transparency: false;
+}
+
+mainbox {
+    spacing: 0;
+    children: [inputbar, message, listview];
+    background-color: #1e1e2e;
+    border-radius: 12;
+    padding: 4;
+}
+
+inputbar {
+    color: #cdd6f4;
+    padding: 14;
+    background-color: #1e1e2e;
+    border-radius: 12 12 0 0;
+}
+
+message {
+    padding: 10;
+    background-color: #45475a;
+}
+
+listview {
+    padding: 8;
+    border-radius: 0 0 12 12;
+    border: 2 2 2 2;
+    border-color: #1e1e2e;
+    background-color: #1e1e2e;
+    dynamic: false;
+}
+
+textbox {
+    text-color: #cdd6f4;
+    background-color: inherit;
+}
+
+error-message {
+    border: 20 20 20 20;
+}
+
+entry, prompt, case-indicator {
+    text-color: inherit;
+}
+
+prompt {
+    margin: 0 10 0 0;
+    background-color: #1e1e2e;
+    text-color: #cdd6f4;
+}
+
+element {
+    padding: 5;
+    vertical-align: 0.5;
+    border-radius: 10;
+    background-color: #313244;
+}
+
+element.selected.normal {
+    background-color: #45475a;
+}
+
+element.alternate.normal {
+    background-color: inherit;
+}
+
+element.normal.active, element.alternate.active {
+    background-color: #fab387;
+}
+
+element.selected.active {
+    background-color: #a6e3a1;
+}
+
+element.normal.urgent, element.alternate.urgent {
+    background-color: #f38ba8;
+}
+
+element.selected.urgent {
+    background-color: #89b4fa;
+}
+
+element-text, element-icon {
+    size: 40;
+    margin: 0 10 0 0;
+    vertical-align: 0.5;
+    background-color: inherit;
+    text-color: #cdd6f4;
+}
+
+element-text .active, element-text .urgent {
+    text-color: #1e1e2e;
+}
+
+mode-switcher {
+    background-color: #1e1e2e;
+    text-color: #cdd6f4;
+    padding: 4 8;
+    border-radius: 6;
+}
+
+mode-switcher .active {
+    background-color: #cba6f7;
+    text-color: #11111b;
+}
+
+entry {
+    background-color: transparent;
+    text-color: #cdd6f4;
+    placeholder-color: #6c7086;
+}
+
+scrollbar {
+    handle-color: #585b70;
+    handle-width: 6;
+    border-radius: 4;
+    background-color: #313244;
+}
+
+button {
+    background-color: #313244;
+    text-color: #cdd6f4;
+    border-radius: 6;
+    padding: 4 12;
+}
+
+button selected {
+    background-color: #cba6f7;
+    text-color: #11111b;
+}
+inputbar {
+    background-color: #1e1e2e;
+    padding: 6px 8px;
+    spacing: 6px;
+    children: [ prompt, entry ];
+}
+
+entry {
+    background-color: #1e1e2e;
+    text-color: #cdd6f4;
+    placeholder-color: #6c7086;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+scrollbar {
+    background-color: #1e1e2e;
+    handle-color: #585b70;
+    handle-width: 6px;
+    border-radius: 4px;
+}
