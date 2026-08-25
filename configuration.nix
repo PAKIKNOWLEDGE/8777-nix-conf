@@ -73,9 +73,18 @@
   # 启用 X11 窗口系统。
   services.xserver.enable = true;
   # enable sddm
-  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = false;
   # ↑之前写错了（旧名 services.xserver.displayManager.sddm）
-  services.xserver.desktopManager.xfce.enable = true; # XFCE
+  # 审美疲劳 换个
+  services.displayManager.ly = {
+    enable = true;
+    x11Support = true;
+    settings = {
+      animation = "none";
+      bigclock = true;
+    }; 
+};
+ services.xserver.desktopManager.xfce.enable = true; # XFCE
   # i3
   services.xserver.windowManager.i3.enable = true;
   # 设置键盘布局为中文
