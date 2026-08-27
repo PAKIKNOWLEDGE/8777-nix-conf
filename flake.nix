@@ -35,6 +35,13 @@
           ./hosts/pain
         ];
       };
+      T430 = nixpkgs.lib.nixosSystem{
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          ./hosts/T430
+        ];
+      };
     };
 
     homeConfigurations.pakiknowledge = home-manager.lib.homeManagerConfiguration {

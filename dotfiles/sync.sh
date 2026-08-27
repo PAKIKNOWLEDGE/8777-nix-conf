@@ -47,7 +47,9 @@ EXCLUDE=(
 HOST_ALIASES=(
   "K1llingMyL0v3:thinkpadx250"
 )
-
+HOST_ALIASES=(
+  "Gater:t430"
+)
 # ---------- 主机识别 ----------
 HOST_ARG=""      # --host 传入的值
 HOST_DIR=""      # 命中的 hosts/<name> 目录 (可为空 = 仅 common)
