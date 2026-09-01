@@ -1,5 +1,6 @@
-[](./nix-b-e.png)
 # NixOS Flake Configuration
+
+![](./nix-b-e.png)
 
 Multi-machine NixOS configuration managed via Flake. Two layers: **system layer** (NixOS packages & services) and **config layer** (dotfiles sync).
 
