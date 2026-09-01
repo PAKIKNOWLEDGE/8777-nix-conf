@@ -4,7 +4,7 @@
 set -euo pipefail
 
 CONF="/etc/nix/nix.conf"
-MIRRORS="substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
+MIRRORS="substituters = https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "请用 sudo 运行：sudo $0"

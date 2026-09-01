@@ -46,8 +46,6 @@ EXCLUDE=(
 # hostname 与 hosts/ 目录名不一致时在此登记: "机器hostname:目录名"
 HOST_ALIASES=(
   "K1llingMyL0v3:thinkpadx250"
-)
-HOST_ALIASES=(
   "Gater:t430"
 )
 # ---------- 主机识别 ----------

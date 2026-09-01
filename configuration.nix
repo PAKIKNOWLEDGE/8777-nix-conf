@@ -296,13 +296,13 @@
 
   # ----- 8777 的个人定制部分 -----
 
-  # 使用中科大（USTC）镜像源
+  # 镜像优先级：SJTU > NJU > TUNA > USTC > cache.nixos.org
   nix.settings = {
     substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC 中科大
-      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" # TUNA 清华
       "https://mirror.sjtu.edu.cn/nix-channels/store" # SJTU 上交
       "https://mirrors.nju.edu.cn/nix-channels/store" # NJU 南大
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" # TUNA 清华
+      "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC 中科大
       "https://cache.nixos.org/"
     ];
     trusted-users = [
