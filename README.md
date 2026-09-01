@@ -1,3 +1,4 @@
+[](./nix-b-e.png)
 # NixOS Flake Configuration
 
 Multi-machine NixOS configuration managed via Flake. Two layers: **system layer** (NixOS packages & services) and **config layer** (dotfiles sync).
