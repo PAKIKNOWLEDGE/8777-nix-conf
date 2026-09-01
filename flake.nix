@@ -38,9 +38,9 @@
       T430 = nixpkgs.lib.nixosSystem{
         system = "x86_64-linux";
         modules = [
-          ./configuration.nix
-          ./hosts/T430
-        ];
+       ./configuration.nix   
+       ./hosts/T430
+                          ];
       };
     };
 
