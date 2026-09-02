@@ -3,7 +3,7 @@ set PATH $PATH /home/pakiknowledge/.local/bin
 set -gx PATH "$HOME/.nix-profile/bin" $PATH
 # ===== Bun 全局包目录 =====
 fish_add_path "$HOME/.bun/bin"
-    # ===== 代理开关（每次打开终端时询问） =====
+# ===== 代理开关（每次打开终端时询问） =====
 if status is-interactive
     if isatty stdin
         read -P '🔌 启用代理 (端口 7897)？ [y/N]: ' -l use_proxy
@@ -34,15 +34,11 @@ starship init fish | source
 zoxide init fish --cmd cd | source
 
 # 别名
-alias ds='reasonix code'
-alias luckerr='reasonix code'
 alias power='upower -i $(upower -e | grep 'BAT') | grep percentage' # 双电池用
-alias rebuild='sudo nixos-rebuild switch'
-alias avim='nvim' # 肌肉记忆没救了
-alias homebuild='home-manager switch'
 alias ship='nix-shell -p updog --run "updog -d $(pwd)"'
 alias cl='clear'
-
+alias rg='grep'
+alias tree='lt'
 # yazi 退出后自动 cd 到浏览目录
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
@@ -51,11 +47,6 @@ function y
         builtin cd -- "$cwd"
     end
     rm -f -- "$tmp"
-end
-
-# astrovim replace LazyVim
-function lvim
-    NVIM_APPNAME=nvim-lazy nvim $argv
 end
 
 # bat 代替 cat
@@ -67,6 +58,7 @@ end
 function ls
     command eza --icons $argv
 end
+
 function lt
     command eza --icons --tree $argv
 end
@@ -74,6 +66,7 @@ end
 # 便捷缩写
 abbr fa fastfetch
 abbr reboot 'systemctl reboot'
+abbr rebuild 'sudo nixos-rebuild switch --flake .#'
 
 # 启动时显示系统信息（xfce4-terminal 内的 session 用 hyfetch 区别对待）
 set -l ppid (ps -p $fish_pid -o ppid= 2>/dev/null | string trim)
