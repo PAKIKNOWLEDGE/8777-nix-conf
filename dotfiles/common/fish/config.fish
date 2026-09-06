@@ -3,23 +3,19 @@ set PATH $PATH /home/pakiknowledge/.local/bin
 set -gx PATH "$HOME/.nix-profile/bin" $PATH
 # ===== Bun 全局包目录 =====
 fish_add_path "$HOME/.bun/bin"
-# ===== 代理开关（每次打开终端时询问） =====
-if status is-interactive
-    if isatty stdin
-        read -P '🔌 启用代理 (端口 7897)？ [y/N]: ' -l use_proxy
-        switch $use_proxy
-            case y Y yes YES
-                set -gx http_proxy "http://127.0.0.1:7897"
-                set -gx https_proxy "http://127.0.0.1:7897"
-                set -gx all_proxy "socks5://127.0.0.1:7897"
-                echo "✅ 代理已启用 (http://127.0.0.1:7897)"
-            case '*'
-                set -e http_proxy
-                set -e https_proxy
-                set -e all_proxy
-                echo "❌ 未启用代理"
-        end
-    end
+# ===== 代理开关 =====
+function proxy-on
+    set -gx http_proxy "http://127.0.0.1:7897"
+    set -gx https_proxy "http://127.0.0.1:7897"
+    set -gx all_proxy "socks5://127.0.0.1:7897"
+    echo "✅ 代理已启用 (http://127.0.0.1:7897)"
+end
+
+function proxy-off
+    set -e http_proxy
+    set -e https_proxy
+    set -e all_proxy
+    echo "❌ 代理已关闭"
 end
 
 # 关闭欢迎语
