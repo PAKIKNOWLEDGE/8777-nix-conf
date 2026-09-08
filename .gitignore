@@ -5,4 +5,8 @@
 # 运行日志不入库（btop.log 曾被误跟踪）
 dotfiles/common/btop/btop.log
 
+# agent 工具私有状态目录不入库 (AGENTS.md 是唯一的跨工具规则载体)
+.claude/
+.dsh-meow/
+
 
