@@ -113,6 +113,7 @@ HOST_ALIASES=(
 2. **备份**：被覆盖/删除的旧文件自动挪到 `~/.config/.dotfiles-backup/<时间戳>/`，不污染应用目录。
 3. **回写不用 `--delete`**：`sync.sh sync` 不会从仓库删文件，安全。
 4. **deploy 前强制预览**：先 dry-run 展示差异，除非 `--yes`。
+5. **差异按内容比较（rsync `-c`）**：预览和真实部署用同一判据，所见即所得；`git pull` 刷新时间戳不会造成"全量假脏"。
 
 ## 排除清单（EXCLUDE）
 

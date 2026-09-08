@@ -19,6 +19,7 @@
 #
 # 安全:
 #   deploy 先 dry-run 预览并要求确认 (--yes 跳过)
+#   差异按内容比较 (rsync -c): git pull 刷新的时间戳不会造成"全量假脏"
 #   仅对"托管应用"使用 --delete, 绝不波及 ~/.config 里未托管的内容
 #   被覆盖/删除的旧文件自动备份到 ~/.config/.dotfiles-backup/<时间戳>/
 
@@ -109,6 +110,17 @@ assemble_stage() {
 }
 
 # ---------- 差异预览 ----------
+# itemize 输出里只有真变更才值得展示:
+#   首字符 '.' 的行是元数据记录 (内容相同仅时间戳漂移等), "created directory" 是提示行
+# grep 无匹配退出码 1 必须吃掉 (pipefail), 否则 set -e 直接终止脚本
+change_lines() { grep -vE '^created |^\.|^$' || true; }
+
+# 干跑预览: 每行一个真实变更 (格式同 rsync -i: >新建/修改  c链接/目录  *deleting  h硬链)
+itemize() {
+  local src="$1" dest="$2"
+  rsync -ani -c --delete --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$src" "$dest" 2>/dev/null | change_lines || true
+}
+
 # 有差异时打印明细并返回 0; 无差异返回 1
 show_diff() {
   local any=1
@@ -119,9 +131,9 @@ show_diff() {
     dest="$LOCAL_DIR/$name"
 
     if [ -d "$entry" ]; then
-      out="$(rsync -anvi --delete "${EXCLUDE[@]}" "$entry/" "$dest/" 2>/dev/null || true)"
+      out="$(itemize "$entry/" "$dest/")"
     else
-      out="$(rsync -anvi "${EXCLUDE[@]}" "$entry" "$dest" 2>/dev/null || true)"
+      out="$(itemize "$entry" "$dest")"
     fi
 
     if [ -n "$out" ]; then
@@ -154,21 +166,27 @@ deploy() {
 
   # 备份目录: 被覆盖/删除的旧文件都挪到这里, 不污染应用配置目录
   local backup_dir="$LOCAL_DIR/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
-  local entry name dest
+  local entry name dest out
   for entry in "$STAGE_DIR"/*; do
     [ -e "$entry" ] || continue
     name="$(basename "$entry")"
     dest="$LOCAL_DIR/$name"
 
+    # 真实写入: 标志与预览一致 (-c 按内容), 只报变更行; 失败时 rsync 退出码照常终止脚本
     if [ -d "$entry" ]; then
       mkdir -p "$dest"
-      rsync -avh --delete --backup --backup-dir="$backup_dir" "${EXCLUDE[@]}" "$entry/" "$dest/"
+      out="$(rsync -ai -c --delete --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$entry/" "$dest/" | change_lines)"
     else
-      rsync -avh --backup --backup-dir="$backup_dir" "${EXCLUDE[@]}" "$entry" "$dest"
+      out="$(rsync -ai -c --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$entry" "$dest" | change_lines)"
     fi
+    [ -n "$out" ] && { echo "── $name"; echo "$out"; }
   done
 
-  echo "✅ 部署完成 (旧文件备份在 ~/.config/.dotfiles-backup/)"
+  if [ -d "$backup_dir" ]; then
+    echo "✅ 部署完成 (旧文件已备份到: $backup_dir)"
+  else
+    echo "✅ 部署完成 (无旧文件被覆盖, 未产生备份)"
+  fi
 }
 
 # ---------- 回写: 本地 → 仓库 ----------
@@ -189,7 +207,7 @@ sync_back() {
     done
   fi
 
-  local name target
+  local name target line out
   for name in $apps; do
     if [ ! -e "$LOCAL_DIR/$name" ]; then
       echo "  跳过 $name (本地不存在)"
@@ -199,17 +217,24 @@ sync_back() {
     # 归属规则: host 层存在 → 归 host; 否则归 common
     if [ -n "$HOST_DIR" ] && [ -e "$HOST_DIR/$name" ]; then
       target="$HOST_DIR/$name"
-      printf '→ hosts/%s/%s\n' "$HOST_NAME" "$name"
+      line="→ hosts/$HOST_NAME/$name"
     else
       target="$COMMON_DIR/$name"
-      printf '→ common/%s\n' "$name"
+      line="→ common/$name"
     fi
 
     mkdir -p "$(dirname "$target")"
+    # 真实回写, 输出与 diff 同格式; 无变化则合并到归属行
     if [ -d "$LOCAL_DIR/$name" ]; then
-      rsync -avh "${EXCLUDE[@]}" "$LOCAL_DIR/$name/" "$target/"
+      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$LOCAL_DIR/$name/" "$target/" | change_lines)"
     else
-      rsync -avh "${EXCLUDE[@]}" "$LOCAL_DIR/$name" "$target"
+      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$LOCAL_DIR/$name" "$target" | change_lines)"
+    fi
+    if [ -n "$out" ]; then
+      echo "$line"
+      echo "$out"
+    else
+      echo "$line (无变化)"
     fi
   done
   echo "✅ 回写完成"
