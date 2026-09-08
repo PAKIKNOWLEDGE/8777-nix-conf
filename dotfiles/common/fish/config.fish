@@ -36,6 +36,7 @@ alias cl='clear'
 alias rg='grep'
 alias tree='lt'
 alias homebuild='home-manager switch --flake .'
+alias today='date +%F'
 # yazi 退出后自动 cd 到浏览目录
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")

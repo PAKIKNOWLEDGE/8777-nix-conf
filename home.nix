@@ -25,6 +25,7 @@
     nixd # for .nix file LSP support
     nil # nix lsp yet another simple mode
     taplo # toml toolkit written in rust
+    kdePackages.gwenview # 看图用 比ristretto好用
 
          ];
 
