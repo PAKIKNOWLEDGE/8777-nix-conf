@@ -1,4 +1,4 @@
-{ ... }: {
+{ pkgs,... }: {
   networking.hostName = "Gater";
   imports = [ ./hardware.nix ];
   # Hermes 网关：合盖不休眠（无论插电/电池/底座）
@@ -7,4 +7,7 @@
     lidSwitchExternalPower = "ignore";
     lidSwitchDocked = "ignore";
   };
+  environment.systemPackages = [
+    pkgs.cloudflared
+     ];
 }
