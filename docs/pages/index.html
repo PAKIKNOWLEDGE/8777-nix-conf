@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文档索引 · ~/nix/nixos</title>
 <meta name="description" content="NixOS + dotfiles 双主机仓库文档索引：新机器接入指南与 dotfiles 同步系统参考手册">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -57,13 +54,13 @@
 <main class="index-body">
   <h2 class="quick-ref">文档</h2>
   <div class="cards">
-    <a class="card" href="new-pc-guide.html">
+    <a class="card" href="new-pc-guide.html" data-word="BOOT">
       <span class="card-tag">新机器接入 · 端到端流程</span>
       <h2>新机器接入指南</h2>
       <p>来一台新机器：系统层（NixOS）→ 配置层（dotfiles）两条线都要接。照着做就行。</p>
       <span class="card-go">开始接入</span>
     </a>
-    <a class="card" href="dotfiles-guide.html">
+    <a class="card" href="dotfiles-guide.html" data-word="SYNC">
       <span class="card-tag">同步系统 · 完整参考</span>
       <h2>dotfiles 同步系统参考手册</h2>
       <p>分层规则、sync.sh 全部命令、安全机制、排除清单、排障。</p>
@@ -73,12 +70,12 @@
 
   <h2 class="quick-ref">快速对照</h2>
   <div class="cards">
-    <div class="card" style="cursor:default">
+    <div class="card" style="cursor:default" data-word="SYS">
       <span class="card-tag">系统层</span>
       <h2>哪台机器装什么软件 / 服务</h2>
       <p>→ <code>hosts/&lt;Host&gt;/</code>（NixOS，走 flake 构建）</p>
     </div>
-    <div class="card" style="cursor:default">
+    <div class="card" style="cursor:default" data-word="CFG">
       <span class="card-tag">配置层</span>
       <h2>哪台机器的 dotfile 不同</h2>
       <p>→ <code>dotfiles/hosts/&lt;host&gt;/</code>（rsync，走 <code>sync.sh</code>）</p>
