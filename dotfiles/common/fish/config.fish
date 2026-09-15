@@ -33,7 +33,6 @@ zoxide init fish --cmd cd | source
 alias power='upower -i $(upower -e | grep 'BAT') | grep percentage' # 双电池用
 alias ship='nix-shell -p updog --run "updog -d $(pwd)"'
 alias cl='clear'
-alias rg='grep'
 alias tree='lt'
 alias homebuild='home-manager switch --flake .'
 alias today='date +%F'
@@ -50,6 +49,22 @@ end
 # bat 代替 cat
 function cat
     command bat $argv
+end
+
+# grep 交互时走 ripgrep（正则更快、默认递归、认 .gitignore、高亮分组）
+# 只改 fish 函数层: sh -c / 子进程里的 grep 不受影响，脚本无需担心被换掉
+function grep
+    # -E(rg 里是 --encoding) / -R / -Z / -w(rg 里是"反向"词匹配) 语义与 grep 冲突，
+    # 且 rg 本身默认就是递归搜索，这些情况退回真 grep 免得给出错误结果
+    set -l rgunsafe
+    for a in $argv
+        string match -rq -- '^-[^-]*[ERZw]' "$a" && set rgunsafe 1
+    end
+    if test -n "$rgunsafe"; or not isatty 1
+        command grep --color=auto $argv
+    else
+        command rg $argv
+    end
 end
 
 # eza 代替 ls
@@ -74,3 +89,7 @@ if test "$pname" = ".xfce4-terminal"; or test "$pname" = alacritty
 else
     fastfetch
 end
+
+# >>> grok installer >>>
+fish_add_path $HOME/.grok/bin
+# <<< grok installer <<<
