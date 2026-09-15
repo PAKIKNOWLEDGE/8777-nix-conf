@@ -21,6 +21,8 @@
 #   deploy 先 dry-run 预览并要求确认 (--yes 跳过)
 #   差异按内容比较 (rsync -c): git pull 刷新的时间戳不会造成"全量假脏"
 #   仅对"托管应用"使用 --delete, 绝不波及 ~/.config 里未托管的内容
+#   托管应用内本地生成的文件 (completions/、conf.d/、fish_variables 等) 由
+#   DELETE_PROTECT 保护, deploy 不会把它们当"仓库里没有的东西"删掉
 #   被覆盖/删除的旧文件自动备份到 ~/.config/.dotfiles-backup/<时间戳>/
 
 set -euo pipefail
@@ -30,19 +32,27 @@ COMMON_DIR="$SCRIPT_DIR/common"
 HOSTS_DIR="$SCRIPT_DIR/hosts"
 LOCAL_DIR="$HOME/.config"
 
-# 唯一一份排除清单 (旧版每个脚本各抄一份, 改漏一处就漂移)
-EXCLUDE=(
-  --exclude=".git"
-  --exclude=".gitkeep"
-  --exclude="*.bak"
-  --exclude="*.log"
-  --exclude="lazy-lock.json"
-  --exclude="generated.lua"
-  --exclude="completions/"
-  --exclude="conf.d/"
-  --exclude="functions/"
-  --exclude="__pycache__/"
+# 唯一一份模式清单 (旧版每个脚本各抄一份, 改漏一处就漂移)
+# 不能用 --exclude: 它同时把本地文件排除出 rsync 视野, --delete 随即把这些
+# "仓库里没有的东西"删掉 (取消跟踪 fish_variables 后, deploy 差点删了本机那份);
+# 而 --include 只作用于传输、挡不住删除。所以一条模式显式拆成两条规则:
+#   "- pattern"  不传输 (deploy 不推送, sync 不回写)
+#   "P pattern"  本地受保护, --delete 不得删除 (只有 deploy 带 --delete, 故 sync 不受影响)
+SYNC_PATTERNS=(
+  ".git"
+  ".gitkeep"
+  "*.bak"
+  "*.log"
+  "lazy-lock.json"
+  "generated.lua"
+  "completions/"
+  "conf.d/"
+  "functions/"
+  "__pycache__/"
+  "fish_variables"   # 每机本地状态, fish 自建; 既不入库也不许被 deploy 删掉
 )
+PATTERNS=();  for _p in "${SYNC_PATTERNS[@]}"; do PATTERNS+=(--filter="- $_p"); done
+DELETE_PROTECT=(); for _p in "${SYNC_PATTERNS[@]}"; do DELETE_PROTECT+=(--filter="P $_p"); done
 
 # hostname 与 hosts/ 目录名不一致时在此登记: "机器hostname:目录名"
 HOST_ALIASES=(
@@ -90,7 +100,7 @@ assemble_stage() {
   STAGE_DIR="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles.XXXXXX")"
 
   # 第 1 层: common 全部铺进 staging
-  rsync -a "${EXCLUDE[@]}" "$COMMON_DIR/" "$STAGE_DIR/"
+  rsync -a "${PATTERNS[@]}" "$COMMON_DIR/" "$STAGE_DIR/"
 
   # 第 2 层: host 覆盖 — host 里出现的应用, common 那份整个丢弃, 只留 host 的
   [ -n "$HOST_DIR" ] || return
@@ -102,9 +112,9 @@ assemble_stage() {
     rm -rf "$STAGE_DIR/$name"
     # 目录源必须加尾斜杠, 否则 rsync 会嵌套成 name/name/
     if [ -d "$entry" ]; then
-      rsync -a "${EXCLUDE[@]}" "$entry/" "$STAGE_DIR/$name"
+      rsync -a "${PATTERNS[@]}" "$entry/" "$STAGE_DIR/$name"
     else
-      rsync -a "${EXCLUDE[@]}" "$entry" "$STAGE_DIR/$name"
+      rsync -a "${PATTERNS[@]}" "$entry" "$STAGE_DIR/$name"
     fi
   done
 }
@@ -118,7 +128,7 @@ change_lines() { grep -vE '^created |^\.|^$' || true; }
 # 干跑预览: 每行一个真实变更 (格式同 rsync -i: >新建/修改  c链接/目录  *deleting  h硬链)
 itemize() {
   local src="$1" dest="$2"
-  rsync -ani -c --delete --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$src" "$dest" 2>/dev/null | change_lines || true
+  rsync -ani -c --delete --omit-dir-times --out-format='%i %n%L' "${PATTERNS[@]}" "${DELETE_PROTECT[@]}" "$src" "$dest" 2>/dev/null | change_lines || true
 }
 
 # 有差异时打印明细并返回 0; 无差异返回 1
@@ -175,9 +185,9 @@ deploy() {
     # 真实写入: 标志与预览一致 (-c 按内容), 只报变更行; 失败时 rsync 退出码照常终止脚本
     if [ -d "$entry" ]; then
       mkdir -p "$dest"
-      out="$(rsync -ai -c --delete --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$entry/" "$dest/" | change_lines)"
+      out="$(rsync -ai -c --delete --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${PATTERNS[@]}" "${DELETE_PROTECT[@]}" "$entry/" "$dest/" | change_lines)"
     else
-      out="$(rsync -ai -c --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$entry" "$dest" | change_lines)"
+      out="$(rsync -ai -c --backup --backup-dir="$backup_dir" --omit-dir-times --out-format='%i %n%L' "${PATTERNS[@]}" "$entry" "$dest" | change_lines)"
     fi
     [ -n "$out" ] && { echo "── $name"; echo "$out"; }
   done
@@ -226,9 +236,9 @@ sync_back() {
     mkdir -p "$(dirname "$target")"
     # 真实回写, 输出与 diff 同格式; 无变化则合并到归属行
     if [ -d "$LOCAL_DIR/$name" ]; then
-      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$LOCAL_DIR/$name/" "$target/" | change_lines)"
+      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${PATTERNS[@]}" "$LOCAL_DIR/$name/" "$target/" | change_lines)"
     else
-      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${EXCLUDE[@]}" "$LOCAL_DIR/$name" "$target" | change_lines)"
+      out="$(rsync -ai -c --omit-dir-times --out-format='%i %n%L' "${PATTERNS[@]}" "$LOCAL_DIR/$name" "$target" | change_lines)"
     fi
     if [ -n "$out" ]; then
       echo "$line"

@@ -112,25 +112,39 @@ HOST_ALIASES=(
 1. **`--delete` 只作用于托管应用**：部署时对每个应用目录独立 `--delete`，绝不碰 `~/.config` 里未托管的配置。
 2. **备份**：被覆盖/删除的旧文件自动挪到 `~/.config/.dotfiles-backup/<时间戳>/`，不污染应用目录。
 3. **回写不用 `--delete`**：`sync.sh sync` 不会从仓库删文件，安全。
-4. **deploy 前强制预览**：先 dry-run 展示差异，除非 `--yes`。
-5. **差异按内容比较（rsync `-c`）**：预览和真实部署用同一判据，所见即所得；`git pull` 刷新时间戳不会造成"全量假脏"。
+4. **本地产物免于 `--delete`**：托管应用目录内本地生成的文件（`completions/`、
+   `conf.d/`、`functions/`、`fish_variables`、`*.log`）由 `P` 保护规则兜住，
+   deploy 只覆盖仓库里有的东西，不会顺手删掉本机独有的。
+5. **deploy 前强制预览**：先 dry-run 展示差异，除非 `--yes`。
+6. **差异按内容比较（rsync `-c`）**：预览和真实部署用同一判据，所见即所得；`git pull` 刷新时间戳不会造成"全量假脏"。
 
-## 排除清单（EXCLUDE）
+## 同步模式清单（SYNC_PATTERNS）
 
-脚本顶部只有一份：
+脚本顶部只有一份模式清单：
 
 ```
 .git, .gitkeep, *.bak, *.log, lazy-lock.json, generated.lua,
-completions/, conf.d/, functions/, __pycache__/
+completions/, conf.d/, functions/, __pycache__/, fish_variables
 ```
 
-这些是"生成的不该入库"的内容（nvim 的 lock、fish 自动生成的目录等）。
-要加排除项：只改脚本顶部一处，所有同步自动生效。
+这些是"生成的不该入库"的内容（nvim 的 lock、fish 自动生成的目录等），
+外加每机本地状态（`fish_variables` 由 fish 自建、`*.log` 覆盖 btop 的日志）。
+要加条目：只改脚本顶部一处，deploy / sync / diff 自动同时生效。
 
-另有一类"每机本地状态"，不属于 EXCLUDE（EXCLUDE 管的是生成物/目录），而是靠
-`.gitignore` + 不入库处理：`dotfiles/common/fish/fish_variables`、
-`dotfiles/common/btop/btop.log`。它们由程序自己维护，跨机共享必然长期脏，
-还会把一台机器的状态推给另外两台。deploy 不带它们，本地已有的一律不动。
+### 为什么用 --filter 而不是 --exclude（重要）
+
+一份模式会被展开成两条 rsync 规则：
+
+- `- pattern`：不传输。deploy 不把它推到本机，sync 也不把它回写进仓库。
+- `P pattern`：本地产物受保护，`--delete` 不许删它（只有 deploy 带 `--delete`，
+  所以回写方向不受影响）。
+
+曾经的 `--exclude` 写法同时把本地产物排除出 rsync 的视野，于是 **`--delete`
+会把它们当成"仓库里没有的东西"删掉**：取消跟踪 `fish_variables` 之后，
+`sync.sh diff` 立刻预报 `*deleting fish_variables`，真跑就把本机那份删了
+（`completions/grok.fish`、`conf.d/fish_frozen_*` 同理，只是它们所在的目录恰好
+整目录不传输才侥幸没被扫到）。预览与真实部署共用同一判据，所以 diff 看到什么
+就是什么——这条预报当年就是数据丢失的预告，不是噪音。
 
 ## 场景
 

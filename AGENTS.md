@@ -54,16 +54,25 @@ docs/                  运维手册（new-pc-guide / dotfiles-guide / DESIGN_NOT
 - **永远不要往 `~/.config` 直接写托管应用的配置再指望 git diff 能看懂**——
   用 `sync.sh sync` 回写，它会按归属规则落位。
 - sync.sh 的差异判据是内容比较（rsync `-c`），预览（dry-run）与真实部署同一判据、
-  同一 EXCLUDE。修改输出逻辑时保持这两处共用，历史上曾漂移过。
-- `EXCLUDE` 数组（脚本顶部）是唯一一份排除清单，deploy/sync/diff 三处共用，
-  别在任何一处内联复制。
+  同一模式清单（`PATTERNS` + `DELETE_PROTECT`）。修改输出逻辑时保持这两处共用，历史上曾漂移过。
+- `SYNC_PATTERNS`（脚本顶部）是唯一一份模式清单，deploy/sync/diff 三处共用，
+  别在任何一处内联复制。它会展开成 `- pattern`（不传输）与 `P pattern`（本机文件
+  免于 `--delete`）两条 rsync 规则。**不要改回 `--exclude`**：`--exclude` 让本地产物
+  逃出 rsync 视野，`--delete` 就会把它们当"仓库里没有的东西"删掉（曾因此差点删掉
+  本机 `~/.config/fish/fish_variables` 与 `completions/grok.fish`）。
 
 ## 已知问题清单（可修，修前报告）
 
 - ~~`dotfiles/common/btop/btop.log` 与 `dotfiles/common/fish/fish_variables`
   仍被 git 跟踪~~ 已处理（2026-09-15）：两者 `git rm --cached` 取消跟踪 + 写进
-  `.gitignore`，磁盘文件保留。`deploy` 的 staging 组装阶段本就带 `EXCLUDE`
-  （含 `*.log`），所以它们不进 staging，`--delete` 不会波及本机已有的同名文件。
+  `.gitignore`，磁盘文件保留；`fish_variables` 同时进 `SYNC_PATTERNS`（`btop.log`
+  已被 `*.log` 覆盖），回写不再把它抄进仓库。
+- ~~（修上一条时暴露的）`deploy` 会删掉托管应用目录里本机独有的文件~~ 已修
+  （2026-09-15）：`--exclude` → `--filter="- ..."` + `--filter="P ..."`。
+  实测沙箱（`/tmp` 假 HOME）：修复前 diff 预报 `*deleting fish_variables` 且真 deploy
+  执行删除；修复后本机 `fish_variables`/`btop.log`/`completions/grok.fish`/
+  `conf.d/fish_frozen_*` 全部幸存、内容不变，仓库层回写后仍不含它们，二次 deploy
+  "已是最新"（幂等）。`.bak` 类本地垃圾仍会被扫掉——那是想要的行为。
 - `configuration.nix` 的陈旧注释已处理（2026-09-15）：onlyoffice 那段历史注释补了
   "现状核对"（krita 仍在且 pin 在 25.11、onlyoffice 已移除），硬件配置"仓库里不跟踪"
   的错误说法改成实际做法（按 hosts/<机器>/hardware.nix 入库、三台各一份）。
