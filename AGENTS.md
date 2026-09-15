@@ -60,9 +60,14 @@ docs/                  运维手册（new-pc-guide / dotfiles-guide / DESIGN_NOT
 
 ## 已知问题清单（可修，修前报告）
 
-- `dotfiles/common/btop/btop.log` 与 `dotfiles/common/fish/fish_variables`
-  仍被 git 跟踪；后者是每机本地状态，理论上不该同步。
-- `configuration.nix` 有陈旧注释（提到已不存在的 onlyoffice；`imports = [ ]` 是死代码）。
+- ~~`dotfiles/common/btop/btop.log` 与 `dotfiles/common/fish/fish_variables`
+  仍被 git 跟踪~~ 已处理（2026-09-15）：两者 `git rm --cached` 取消跟踪 + 写进
+  `.gitignore`，磁盘文件保留。`deploy` 的 staging 组装阶段本就带 `EXCLUDE`
+  （含 `*.log`），所以它们不进 staging，`--delete` 不会波及本机已有的同名文件。
+- `configuration.nix` 的陈旧注释已处理（2026-09-15）：onlyoffice 那段历史注释补了
+  "现状核对"（krita 仍在且 pin 在 25.11、onlyoffice 已移除），硬件配置"仓库里不跟踪"
+  的错误说法改成实际做法（按 hosts/<机器>/hardware.nix 入库、三台各一份）。
+  `imports = [ ]` 仍在——它是上方 imports 教学注释的落点，删这行属行为/风格判断，未动。
 - `home.nix` 的 `programs.bash.initExtra` 配了 starship，但用户 shell 是 fish——死配置。
 - T430 是常开网关（hostname `Gater`），但防火墙在公共层全局关闭。
 - `docs/PLUGINS.md` 来源不明（DSH 插件清单），与仓库主题关系弱。

@@ -14,13 +14,16 @@
     sudo nixos-install --flake /路径/到/仓库#ThinkPadX250 \
       --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
 
-  切记：hardware-configuration.nix 是每台机器独一无二的，仓库里不跟踪，放 hosts/<机器>/。
+  切记：hardware-configuration.nix 是每台机器独一无二的，别跨机复制；本仓库按
+  hosts/<机器>/hardware.nix 入库跟踪（三台各一份，内容互不兼容）。
 
   HM 层直接走 flake：
     home-manager switch --flake ~/nix/nixos#pakiknowledge
 
   2026-06-25：此时，HM“仅”为了解决krita和onlyoffice这两个巨无霸。以后，会慢慢迭代，让更多的
   包也流入进HM管理的层面。
+  （现状核对：krita 仍在 home.nix，且为绕开 26.05 字体菜单 bug 固定用 nixpkgs-25-11；
+   onlyoffice 后来被移除，现在仓库里已无此包，这段只是历史记录。）
 */
 { config, pkgs, ... }:
 

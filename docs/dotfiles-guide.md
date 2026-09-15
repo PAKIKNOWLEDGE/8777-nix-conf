@@ -127,6 +127,11 @@ completions/, conf.d/, functions/, __pycache__/
 这些是"生成的不该入库"的内容（nvim 的 lock、fish 自动生成的目录等）。
 要加排除项：只改脚本顶部一处，所有同步自动生效。
 
+另有一类"每机本地状态"，不属于 EXCLUDE（EXCLUDE 管的是生成物/目录），而是靠
+`.gitignore` + 不入库处理：`dotfiles/common/fish/fish_variables`、
+`dotfiles/common/btop/btop.log`。它们由程序自己维护，跨机共享必然长期脏，
+还会把一台机器的状态推给另外两台。deploy 不带它们，本地已有的一律不动。
+
 ## 场景
 
 ### 新加一台机器
