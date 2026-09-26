@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrokBuild 配置方法 · ~/nix/nixos</title>
+<meta name="description" content="GrokBuild 配置方法：二进制安装位置、custom provider 的 ~/.grok/config.toml 写法，以及模型定义名里点号的 TOML 解析坑">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html">dotfiles 手册</a>
+      <a href="ref-notes.html">借鉴清单</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <aside class="toc" aria-label="本页目录">
+    <h4>本页目录</h4>
+    <ol>
+      <li><a href="#g-bin">GrokBuild配置方法</a></li>
+      <li><a href="#g-provider">custom provider 配置方法</a></li>
+      <li class="l2"><a href="#g-dot">坑点：定义名与点号</a></li>
+    </ol>
+  </aside>
+
+  <details class="toc-mobile">
+    <summary>目录</summary>
+    <ol>
+      <li><a href="#g-bin">GrokBuild配置方法</a></li>
+      <li><a href="#g-provider">custom provider 配置方法</a></li>
+      <li><a href="#g-dot">坑点：定义名与点号</a></li>
+    </ol>
+  </details>
+
+  <article class="doc">
+    <h1>GrokBuild 配置备忘</h1>
+    <p class="lede">备忘性质：二进制落在哪、custom provider 怎么定义、一个会让 TOML 直接解析失败的命名坑。</p>
+
+    <h2 id="g-bin">GrokBuild配置方法</h2>
+    <p>通过 <code>which grok</code> 发现自动安装器会将二进制放在 <code>~/.local/bin/grok</code></p>
+
+    <h2 id="g-provider">custom provider 配置方法</h2>
+    <p>编辑 <code>~/.grok/config.toml</code></p>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">配置</span><span class="cmd-lang">toml</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="cm"># 对于grok-build而言，1个模型占用一个基础字段</span>
+<span class="cm"># 即使同一供应商，两个模型也会占用两个字段。如，GPT5.6Sol/GPT6.0Astra虽然全部来自于openai,但是会占用两个字段</span>
+telemetry = false <span class="cm"># 关闭遥测</span>
+
+[models]
+default = "填入你的定义" <span class="cm"># 这个地方可以在内部用/model改</span>
+
+<span class="cm"># 一个模型配置示例</span>
+
+[model.定义名]
+model = "模型ID"
+base_url = "https://xxx/v1" <span class="cm"># 具体看你供应商上游、格式</span>
+api_key = "SK-XXXXX" <span class="cm"># 也可以通过环境变量传入，但是标头改为：env_key = "变量名"</span>
+context_window = <span class="cm">#这里填入上下文窗口，必须是整数</span>
+api_backend = "" <span class="cm"># 接口类型</span></code></pre>
+    </div>
+
+    <h3 id="g-dot">坑点：定义名与点号</h3>
+    <div class="callout alert">
+      <span class="ca-label">坑点</span>
+      <p>上文“定义名” 在语义抽象上，应该理解为 alias。也就是说，你将其定义为比如什么 <code>KnucklesDoesntGiveaFlyingFxxk</code> 什么的名字都可以。</p>
+      <p>但是！注意，点号会被 toml 解析为分隔符：e.g. <code>Qwen3.8flash</code> 这个字段在 toml 解析器看来是 <code>Qwen3</code> 和 <code>8flash</code> 两个字段，直接解析失败。</p>
+      <p>现在模型迭代都喜欢用数字.数字当版本号。严格来说，这里语义坍缩了，务必注意。</p>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>备忘 · GrokBuild 配置</span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a> · <a href="ref-notes.html">借鉴清单</a> · <a href="hermes-agent.html">hermes-agent 安装</a> · <a href="npm.html">npm 备忘</a> · <a href="design-notes.html">站点设计说明</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

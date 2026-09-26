@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>npm 备忘 · ~/nix/nixos</title>
+<meta name="description" content="NixOS 上用 npm 的前置设置（prefix 与 PATH）以及绕开网络的 cnpm 方案">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html">dotfiles 手册</a>
+      <a href="ref-notes.html">借鉴清单</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <aside class="toc" aria-label="本页目录">
+    <h4>本页目录</h4>
+    <ol>
+      <li><a href="#n-prefix">before use npm in nix(new)</a></li>
+      <li><a href="#n-mirror">how 2 beat gfw</a></li>
+    </ol>
+  </aside>
+
+  <details class="toc-mobile">
+    <summary>目录</summary>
+    <ol>
+      <li><a href="#n-prefix">before use npm in nix(new)</a></li>
+      <li><a href="#n-mirror">how 2 beat gfw</a></li>
+    </ol>
+  </details>
+
+  <article class="doc">
+    <h1>npm 备忘</h1>
+    <p class="lede">备忘性质：NixOS 上装 node 全局包前先改 prefix，并把 bin 目录挂进 PATH。</p>
+
+    <h2 id="n-prefix">before use npm in nix(new)</h2>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">配置</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>npm set prefix ~/.npm-global</code></pre>
+    </div>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">检查</span><span class="cmd-lang">fish</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>cat .fishrc | rg npm
+set -p PATH ~/.local/bin ~/.cargo/bin ~/.npm-global/bin</code></pre>
+    </div>
+
+    <h2 id="n-mirror">how 2 beat gfw</h2>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag in"><span class="glyph">↓</span>拉取</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>npm i -g cnpm</code></pre>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>备忘 · npm</span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a> · <a href="ref-notes.html">借鉴清单</a> · <a href="grok-build-config.html">Grok Build 配置</a> · <a href="hermes-agent.html">hermes-agent 安装</a> · <a href="design-notes.html">站点设计说明</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

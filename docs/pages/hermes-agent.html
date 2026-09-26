@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hermes-agent 安装备忘 · ~/nix/nixos</title>
+<meta name="description" content="hermes-agent 安装脚本在 NixOS 上的依赖问题（python3.11 / uv 源慢）与两条绕法">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html">dotfiles 手册</a>
+      <a href="ref-notes.html">借鉴清单</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <aside class="toc" aria-label="本页目录">
+    <h4>本页目录</h4>
+    <ol>
+      <li><a href="#h-install">安装脚本</a></li>
+      <li><a href="#h-dep">强依赖与冲突</a></li>
+      <li><a href="#h-fix">两条绕法</a></li>
+      <li><a href="#h-risk">来源可靠性</a></li>
+    </ol>
+  </aside>
+
+  <details class="toc-mobile">
+    <summary>目录</summary>
+    <ol>
+      <li><a href="#h-install">安装脚本</a></li>
+      <li><a href="#h-dep">强依赖与冲突</a></li>
+      <li><a href="#h-fix">两条绕法</a></li>
+      <li><a href="#h-risk">来源可靠性</a></li>
+    </ol>
+  </details>
+
+  <article class="doc">
+    <h1>关于 hermes agent 的安装</h1>
+    <p class="lede">备忘（原文标注 20260817）。</p>
+
+    <h2 id="h-install">安装脚本</h2>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag in"><span class="glyph">↓</span>拉取</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code>curl -fsSL https://res1.hermesagent.org.cn/install.sh | bash</code></pre>
+    </div>
+    <p>上面的 <code>install.sh | bash</code> 依旧是可用的。</p>
+
+    <h2 id="h-dep">强依赖与冲突</h2>
+    <ul>
+      <li>这个脚本强依赖的点有：<code>python3.11</code>、<code>uv</code></li>
+      <li>而 nixpkg 的 <code>python3</code> 断言指向 <code>python3.13</code>，这个脚本一开始爬不到，会用 uv 去拉一个做 venv</li>
+      <li>但是 uv 默认源比较慢，那么：</li>
+    </ul>
+
+    <h2 id="h-fix">两条绕法</h2>
+    <ol class="steps">
+      <li><span class="stepnum">1</span>手动用环境变量注入去用 uv 装 <code>python3.11</code>，然后让脚本跳过检测</li>
+      <li><span class="stepnum">2</span>提前配置好 uv 的全局镜像 <strong>(recommended)</strong></li>
+    </ol>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">配置</span><span class="cmd-lang">bash · 绕法 1</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="cm"># 用国内镜像拉 python-build-standalone，再让安装脚本跳过检测</span>
+export UV_PYTHON_INSTALL_MIRROR="https://mirror.nju.edu.cn/github-release/astral-sh/python-build-standalone"
+uv python install 3.11</code></pre>
+    </div>
+
+    <h2 id="h-risk">来源可靠性</h2>
+    <div class="callout alert">
+      <span class="ca-label">此外</span>
+      <p><code>https://res1.hermesagent.org.cn/install.sh</code> 是国内的人公益维护，不一定可靠。</p>
+    </div>
+  </article>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>备忘 · hermes-agent 安装</span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a> · <a href="ref-notes.html">借鉴清单</a> · <a href="grok-build-config.html">Grok Build 配置</a> · <a href="npm.html">npm 备忘</a> · <a href="design-notes.html">站点设计说明</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

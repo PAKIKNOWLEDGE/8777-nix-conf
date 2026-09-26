@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文档索引 · ~/nix/nixos</title>
-<meta name="description" content="NixOS + dotfiles 双主机仓库文档索引：新机器接入指南与 dotfiles 同步系统参考手册">
+<meta name="description" content="NixOS + dotfiles 三台机器仓库文档索引：新机器接入指南、dotfiles 同步系统参考手册、借鉴清单与零散备忘">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,12 +16,13 @@
       <a href="index.html" aria-current="page">索引</a>
       <a href="new-pc-guide.html">新机器指南</a>
       <a href="dotfiles-guide.html">dotfiles 手册</a>
+      <a href="ref-notes.html">借鉴清单</a>
     </nav>
   </div>
 </header>
 
 <section class="hero">
-  <p class="kicker">NixOS · dotfiles · 双主机仓库</p>
+  <p class="kicker">NixOS · dotfiles · 三台机器仓库</p>
   <h1>文档索引</h1>
   <p class="lede">这套配置分两层，注意别搞混两套 <code>hosts/</code>：NixOS 系统层管“装什么”，dotfiles 配置层管“怎么配”。</p>
 </section>
@@ -49,6 +50,7 @@
   <span class="fleet-label">受管机器</span>
   <span class="chip"><span class="chip-code">pain</span><span class="chip-note">台式 · 无电池</span></span>
   <span class="chip"><span class="chip-code">thinkpadx250</span><span class="chip-note">笔记本 · 双电池 BAT0/BAT1</span></span>
+  <span class="chip"><span class="chip-code">t430</span><span class="chip-note">常开网关 · hostname Gater</span></span>
 </div>
 
 <main class="index-body">
@@ -57,14 +59,20 @@
     <a class="card" href="new-pc-guide.html" data-word="BOOT">
       <span class="card-tag">新机器接入 · 端到端流程</span>
       <h2>新机器接入指南</h2>
-      <p>来一台新机器：系统层（NixOS）→ 配置层（dotfiles）两条线都要接。照着做就行。</p>
+      <p>NixOS + dotfiles 端到端流程，照着做就行：系统层 → 配置层两条线都要接。</p>
       <span class="card-go">开始接入</span>
     </a>
     <a class="card" href="dotfiles-guide.html" data-word="SYNC">
-      <span class="card-tag">同步系统 · 完整参考</span>
+      <span class="card-tag">dotfiles 同步系统参考</span>
       <h2>dotfiles 同步系统参考手册</h2>
-      <p>分层规则、sync.sh 全部命令、安全机制、排除清单、排障。</p>
+      <p>分层规则、sync.sh 全部命令、安全机制、同步模式清单（SYNC_PATTERNS）、排障。</p>
       <span class="card-go">查阅手册</span>
+    </a>
+    <a class="card" href="ref-notes.html" data-word="PLAN">
+      <span class="card-tag">借鉴清单 · 待处理</span>
+      <h2>借鉴 hakula139/nixos-config</h2>
+      <p>从 hakula139/nixos-config 提炼的可落地项（CI / 集中清单 / nh / 模块化），待处理。</p>
+      <span class="card-go">看待办</span>
     </a>
   </div>
 
@@ -87,6 +95,34 @@
     <p><strong>新机器必留占位符</strong>：NixOS 侧建目录，dotfiles 侧跑 <code>sync.sh init-host</code>。</p>
   </div>
 
+  <h2 class="quick-ref">备忘</h2>
+  <div class="cards">
+    <a class="card" href="grok-build-config.html" data-word="GROK">
+      <span class="card-tag">CLI · 配置方法</span>
+      <h2>Grok Build 配置</h2>
+      <p>二进制在 <code>~/.local/bin/grok</code>；custom provider 写 <code>~/.grok/config.toml</code>，含定义名点号坑。</p>
+      <span class="card-go">看配置</span>
+    </a>
+    <a class="card" href="hermes-agent.html" data-word="HERMES">
+      <span class="card-tag">安装 · python3.11 / uv</span>
+      <h2>hermes-agent 安装</h2>
+      <p>脚本强依赖 python3.11 与 uv；两条绕法都指向国内镜像源。</p>
+      <span class="card-go">看绕法</span>
+    </a>
+    <a class="card" href="npm.html" data-word="NPM">
+      <span class="card-tag">Node · 全局包</span>
+      <h2>在 Nix 上用 npm</h2>
+      <p>先 <code>npm set prefix ~/.npm-global</code>，PATH 挂上 bin 目录；网络问题用 cnpm。</p>
+      <span class="card-go">看设置</span>
+    </a>
+    <a class="card" href="design-notes.html" data-word="DESIGN">
+      <span class="card-tag">本站 · 设计记录</span>
+      <h2>文档站设计说明</h2>
+      <p>设计 token、字体分治、反默认检查与验证记录；说明了 HTML 为何是手写转写。</p>
+      <span class="card-go">看记录</span>
+    </a>
+  </div>
+
   <div class="table-wrap" style="margin-top:28px">
     <table>
       <thead>
@@ -96,8 +132,8 @@
         <tr><td><code>hosts/&lt;Host&gt;/</code></td><td>NixOS 系统层：每台机器的硬件/服务差异（代号习惯大写）</td></tr>
         <tr><td><code>dotfiles/hosts/&lt;host&gt;/</code></td><td>dotfiles 配置层：每台机器的应用配置差异（代号习惯小写）</td></tr>
         <tr><td><code>configuration.nix</code></td><td>NixOS 公共配置</td></tr>
-        <tr><td><code>home.nix</code></td><td>home-manager 用户级配置</td></tr>
-        <tr><td><code>flake.nix</code></td><td>入口：双主机 + HM</td></tr>
+        <tr><td><code>home.nix</code></td><td>home-manager 用户层配置</td></tr>
+        <tr><td><code>flake.nix</code></td><td>入口：三台机器 + HM</td></tr>
         <tr><td><code>dotfiles/sync.sh</code></td><td>配置层同步入口</td></tr>
       </tbody>
     </table>
@@ -110,7 +146,7 @@
 ├── dotfiles/hosts/&lt;host&gt;/   <span class="cm">dotfiles 配置层: 每台机器的应用配置差异 (代号习惯小写)</span>
 ├── configuration.nix        <span class="cm">NixOS 公共配置</span>
 ├── home.nix                 <span class="cm">home-manager 用户级配置</span>
-├── flake.nix                <span class="cm">入口: 双主机 + HM</span>
+├── flake.nix                <span class="cm">入口: 三台机器 + HM</span>
 └── dotfiles/sync.sh         <span class="cm">配置层同步入口</span></code></pre>
   </div>
 </main>
@@ -118,7 +154,7 @@
 <footer class="footer">
   <span class="foot-path">~/nix/nixos</span>
   <span>文档 · 索引</span>
-  <span><a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a></span>
+  <span><a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a> · <a href="ref-notes.html">借鉴清单</a> · <a href="design-notes.html">站点设计说明</a> · <a href="grok-build-config.html">Grok Build 配置</a> · <a href="hermes-agent.html">hermes-agent 安装</a> · <a href="npm.html">npm 备忘</a></span>
 </footer>
 
 <script src="script.js"></script>

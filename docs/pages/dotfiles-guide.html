@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>dotfiles 同步系统参考手册 · ~/nix/nixos</title>
-<meta name="description" content="dotfiles 同步系统完整参考：分层规则、sync.sh 全部命令、安全机制、排除清单、排障">
+<meta name="description" content="dotfiles 同步系统完整参考：分层规则、sync.sh 全部命令、安全机制、同步模式清单、排障">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,6 +16,7 @@
       <a href="index.html">索引</a>
       <a href="new-pc-guide.html">新机器指南</a>
       <a href="dotfiles-guide.html" aria-current="page">dotfiles 手册</a>
+      <a href="ref-notes.html">借鉴清单</a>
     </nav>
   </div>
 </header>
@@ -31,7 +32,8 @@
       <li><a href="#d-cmds">sync.sh 命令参考</a></li>
       <li><a href="#d-host">主机识别</a></li>
       <li><a href="#d-safety">安全机制</a></li>
-      <li><a href="#d-exclude">排除清单（EXCLUDE）</a></li>
+      <li><a href="#d-patterns">同步模式清单</a></li>
+      <li class="l2"><a href="#d-filter">--filter 而非 --exclude</a></li>
       <li><a href="#d-scenes">场景</a></li>
       <li><a href="#d-trouble">排障</a></li>
       <li><a href="#d-notes">注意事项</a></li>
@@ -48,7 +50,8 @@
       <li><a href="#d-cmds">sync.sh 命令参考</a></li>
       <li><a href="#d-host">主机识别</a></li>
       <li><a href="#d-safety">安全机制</a></li>
-      <li><a href="#d-exclude">排除清单（EXCLUDE）</a></li>
+      <li><a href="#d-patterns">同步模式清单</a></li>
+      <li class="l2"><a href="#d-filter">--filter 而非 --exclude</a></li>
       <li><a href="#d-scenes">场景</a></li>
       <li><a href="#d-trouble">排障</a></li>
       <li><a href="#d-notes">注意事项</a></li>
@@ -73,16 +76,19 @@
       <div class="cmd-bar"><span class="cmd-tag">结构</span><span class="cmd-lang">dotfiles/</span><button class="cmd-copy" type="button">复制</button></div>
       <pre><code><span class="pt">dotfiles/</span>
 ├── sync.sh                  <span class="cm"># 唯一入口</span>
-├── common/                  <span class="cm"># 所有主机共用</span>
-│   ├── nvim/
+├── common/                  <span class="cm"># 所有主机共用 (约 20 个应用)</span>
 │   ├── fish/
-│   ├── i3/
+│   ├── helix/
+│   ├── wezterm/
 │   └── …
 └── hosts/
-    ├── <span class="hl">pain/</span>                <span class="cm"># pain: 占位符 + i3status-rust/ (无电池)</span>
+    ├── <span class="hl">pain/</span>                <span class="cm"># 台式: 占位符 + alacritty/ i3/ i3status-rust/ (无电池)</span>
     │   ├── .gitkeep
     │   └── i3status-rust/
-    └── <span class="hl">thinkpadx250/</span>        <span class="cm"># 笔记本: 占位符 + i3status-rust/ (双电池 BAT0/BAT1)</span>
+    ├── <span class="hl">t430/</span>                <span class="cm"># 常开网关 (hostname Gater): 占位符 + i3/ i3status-rust/</span>
+    │   ├── .gitkeep
+    │   └── i3status-rust/
+    └── <span class="hl">thinkpadx250/</span>        <span class="cm"># 笔记本: 占位符 + alacritty/ i3/ i3status-rust/ (双电池 BAT0/BAT1)</span>
         ├── .gitkeep
         └── i3status-rust/</code></pre>
     </div>
@@ -178,6 +184,7 @@ dotfiles/sync.sh deploy --host thinkpadx250</code></pre>
       <pre><code><span class="cm"># hostname 与目录名不一致时登记: "机器hostname:目录名"</span>
 HOST_ALIASES=(
   "K1llingMyL0v3:thinkpadx250"
+  "Gater:t430"
 )</code></pre>
     </div>
 
@@ -186,18 +193,33 @@ HOST_ALIASES=(
       <li><strong><code>--delete</code> 只作用于托管应用</strong>：部署时对每个应用目录独立 <code>--delete</code>，绝不碰 <code>~/.config</code> 里未托管的配置。</li>
       <li><strong>备份</strong>：被覆盖/删除的旧文件自动挪到 <code>~/.config/.dotfiles-backup/&lt;时间戳&gt;/</code>，不污染应用目录。</li>
       <li><strong>回写不用 <code>--delete</code></strong>：<code>sync.sh sync</code> 不会从仓库删文件，安全。</li>
+      <li><strong>本地产物免于 <code>--delete</code></strong>：托管应用目录内本地生成的文件（<code>completions/</code>、<code>conf.d/</code>、<code>functions/</code>、<code>fish_variables</code>、<code>*.log</code>）由 <code>P</code> 保护规则兜住，deploy 只覆盖仓库里有的东西，不会顺手删掉本机独有的。</li>
       <li><strong>deploy 前强制预览</strong>：先 dry-run 展示差异，除非 <code>--yes</code>。</li>
+      <li><strong>差异按内容比较（rsync <code>-c</code>）</strong>：预览和真实部署用同一判据，所见即所得；<code>git pull</code> 刷新时间戳不会造成“全量假脏”。</li>
     </ol>
 
-    <h2 id="d-exclude">排除清单（EXCLUDE）</h2>
-    <p>脚本顶部只有一份：</p>
+    <h2 id="d-patterns">同步模式清单（SYNC_PATTERNS）</h2>
+    <p>脚本顶部只有<strong>一份</strong>模式清单：</p>
     <div class="cmd">
-      <div class="cmd-bar"><span class="cmd-tag">排除</span><span class="cmd-lang">rsync 模式</span><button class="cmd-copy" type="button">复制</button></div>
+      <div class="cmd-bar"><span class="cmd-tag">模式</span><span class="cmd-lang">rsync 模式</span><button class="cmd-copy" type="button">复制</button></div>
       <pre><code>.git, .gitkeep, *.bak, *.log, lazy-lock.json, generated.lua,
-completions/, conf.d/, functions/, __pycache__/</code></pre>
+completions/, conf.d/, functions/, __pycache__/, fish_variables</code></pre>
     </div>
-    <p>这些是“生成的不该入库”的内容（nvim 的 lock、fish 自动生成的目录等）。<br>
-    要加排除项：只改脚本顶部一处，所有同步自动生效。</p>
+    <p>这些是“生成的不该入库”的内容（nvim 的 lock、fish 自动生成的目录等），<br>
+    外加每机本地状态（<code>fish_variables</code> 由 fish 自建、<code>*.log</code> 覆盖 btop 的日志）。<br>
+    要加条目：只改脚本顶部一处，deploy / sync / diff 自动同时生效。</p>
+
+    <h3 id="d-filter">为什么用 --filter 而不是 --exclude（重要）</h3>
+    <p>一份模式会被展开成两条 rsync 规则：</p>
+    <ul>
+      <li><code>- pattern</code>：不传输。deploy 不把它推到本机，sync 也不把它回写进仓库。</li>
+      <li><code>P pattern</code>：本地产物受保护，<code>--delete</code> 不许删它（只有 deploy 带 <code>--delete</code>，所以回写方向不受影响）。</li>
+    </ul>
+    <div class="callout alert">
+      <span class="ca-label">教训</span>
+      <p>曾经的 <code>--exclude</code> 写法同时把本地产物排除出 rsync 的视野，于是 <strong><code>--delete</code> 会把它们当成“仓库里没有的东西”删掉</strong>：取消跟踪 <code>fish_variables</code> 之后，<code>sync.sh diff</code> 立刻预报 <code>*deleting fish_variables</code>，真跑就把本机那份删了（<code>completions/grok.fish</code>、<code>conf.d/fish_frozen_*</code> 同理，只是它们所在的目录恰好整目录不传输才侥幸没被扫到）。</p>
+      <p>预览与真实部署共用同一判据，所以 diff 看到什么就是什么——这条预报当年就是数据丢失的预告，不是噪音。</p>
+    </div>
 
     <h2 id="d-scenes">场景</h2>
 
@@ -219,7 +241,7 @@ sync.sh deploy               <span class="cm"># 部署公共配置</span>
     <h3>新机器装状态栏（i3status-rust 实例）</h3>
     <ul>
       <li>包在 <code>configuration.nix</code> 公共 <code>systemPackages</code>，NixOS 构建就有</li>
-      <li>配置按机器分：<code>hosts/pain/i3status-rust/</code>（无电池）vs <code>hosts/thinkpadx250/i3status-rust/</code>（双电池）</li>
+      <li>配置按机器分：三台各有一份 —— <code>hosts/pain/i3status-rust/</code>（台式，无电池块）、<code>hosts/t430/i3status-rust/</code>（网关，同样不带电池块）、<code>hosts/thinkpadx250/i3status-rust/</code>（双电池 BAT0/BAT1）</li>
       <li>新机器照此建自己的 <code>hosts/&lt;代号&gt;/i3status-rust/</code></li>
     </ul>
 
@@ -251,7 +273,7 @@ sync.sh deploy               <span class="cm"># 部署公共配置</span>
 <footer class="footer">
   <span class="foot-path">~/nix/nixos</span>
   <span>文档 · dotfiles 同步系统参考手册</span>
-  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a></span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a> · <a href="ref-notes.html">借鉴清单</a> · <a href="design-notes.html">站点设计说明</a> · <a href="grok-build-config.html">Grok Build 配置</a> · <a href="hermes-agent.html">hermes-agent 安装</a> · <a href="npm.html">npm 备忘</a></span>
 </footer>
 
 <script src="script.js"></script>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>借鉴清单 · ~/nix/nixos</title>
+<meta name="description" content="借鉴 hakula139/nixos-config 的待落地项：CI、机器事实集中化、nh 外壳、模块化拆分，以及明确不抄的理由">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="wordmark" href="index.html">~/nix/nixos</a>
+    <nav class="topnav" aria-label="主导航">
+      <a href="index.html">索引</a>
+      <a href="new-pc-guide.html">新机器指南</a>
+      <a href="dotfiles-guide.html">dotfiles 手册</a>
+      <a href="ref-notes.html" aria-current="page">借鉴清单</a>
+    </nav>
+  </div>
+</header>
+
+<main class="page">
+  <aside class="toc" aria-label="本页目录">
+    <h4>本页目录</h4>
+    <ol>
+      <li><a href="#r-ci">1 · GitHub Actions CI</a></li>
+      <li><a href="#r-data">2 · 机器事实集中化</a></li>
+      <li><a href="#r-nh">3 · nh 外壳</a></li>
+      <li><a href="#r-modules">4 · 模块化拆分</a></li>
+      <li><a href="#r-nocopy">明确不抄</a></li>
+      <li><a href="#r-links">关联</a></li>
+    </ol>
+  </aside>
+
+  <details class="toc-mobile">
+    <summary>目录</summary>
+    <ol>
+      <li><a href="#r-ci">1 GitHub Actions CI</a></li>
+      <li><a href="#r-data">2 机器事实集中化</a></li>
+      <li><a href="#r-nh">3 nh 外壳</a></li>
+      <li><a href="#r-modules">4 模块化拆分</a></li>
+      <li><a href="#r-nocopy">明确不抄</a></li>
+      <li><a href="#r-links">关联</a></li>
+    </ol>
+  </details>
+
+  <article class="doc">
+    <h1>ref-notes — 借鉴 hakula139/nixos-config 的待落地项</h1>
+    <p class="lede">来源：<a href="https://github.com/hakula139/nixos-config">https://github.com/hakula139/nixos-config</a><br>
+    本地克隆：X250/T430 各自 <code>~/文档/nixos-config/</code></p>
+
+    <div class="callout">
+      <span class="ca-label">结论速览</span>
+      <p><strong>值得抄的是结构纪律，不是平台抽象。</strong>按性价比排序如下，动手时机自定，均为“看着修复”候选项。</p>
+    </div>
+
+    <h2 id="r-ci"><span class="stepnum">1</span>GitHub Actions CI（白嫖，最先做）</h2>
+    <p>本仓库是公开库，GitHub Actions 对 public repo 免费无限跑。<br>
+    加一个 <code>.github/workflows/ci.yml</code>，每次 push 自动：</p>
+    <ul>
+      <li><code>nix flake check</code>（结构/参数校验）</li>
+      <li><code>statix</code>（nix lint）</li>
+      <li><code>bash -n dotfiles/sync.sh</code>（脚本语法）</li>
+    </ul>
+    <div class="callout">
+      <span class="ca-label">收益</span>
+      <p>坏配置在 push 时标红，不用等 <code>nixos-rebuild</code> 到一半才炸。参考他仓库 <code>.github/workflows/ci.yml</code> 改写即可。</p>
+    </div>
+
+    <h2 id="r-data"><span class="stepnum">2</span>机器事实集中化（data/ 户口本思想）</h2>
+    <p>现状病根——同一台机器的事实登记在三处：</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>位置</th><th>登记形式</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>flake.nix</code></td><td><code>T430</code> / <code>ThinkPadX250</code>（大写目录名）</td></tr>
+          <tr><td><code>dotfiles/hosts/</code></td><td><code>t430</code> / <code>thinkpadx250</code>（小写）</td></tr>
+          <tr><td><code>dotfiles/sync.sh</code></td><td><code>HOST_ALIASES</code> 数组做 hostname↔别名桥接</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>HOST_ALIASES</code> 重复声明事故（commit <code>a2845a5</code>）就是“一个事实抄多份”的病。</p>
+    <div class="callout">
+      <span class="ca-label">解法</span>
+      <p>新建 <code>data/hosts.nix</code> 作为唯一清单（机器名、大小写别名、hostname、IP、角色），flake 注册与 sync.sh 都从它派生/读取。<br>
+      第四台机（捡垃圾装机）接入时只改一处。</p>
+    </div>
+
+    <h2 id="r-nh"><span class="stepnum">3</span>nh 外壳（nix-health）</h2>
+    <p>他的 <code>nixsw</code>/<code>nixgc</code> 别名体系：</p>
+    <ul>
+      <li><code>nh os switch .</code> — 比裸 <code>nixos-rebuild</code> 输出干净</li>
+      <li><code>nh clean all --keep-since 3d</code> — 按时间保留 GC，不搞“今天装明天蒸发”（rustc 被 GC 误伤属同类问题）</li>
+    </ul>
+    <p>X250 与 T430 都适用；装进 <code>systemPackages</code> + fish alias 即可。</p>
+
+    <h2 id="r-modules"><span class="stepnum">4</span>模块化拆分（_profiles 双层结构）</h2>
+    <p>他的结构：<code>hosts/_profiles/platform/</code>（硬件形态）+ <code>role/</code>（系统角色），host 目录只剩“注册 + 差异”。</p>
+    <p>我方对应改法：</p>
+    <div class="cmd">
+      <div class="cmd-bar"><span class="cmd-tag">结构</span><span class="cmd-lang">profiles/</span><button class="cmd-copy" type="button">复制</button></div>
+      <pre><code><span class="pt">profiles/</span>
+  role/gateway.nix     <span class="cm"># 无头基线 + logind ignore + 常驻服务</span>
+  role/desktop.nix     <span class="cm"># XFCE/i3 + GUI 大件（firefox 保留在 T430，见安全条目）</span></code></pre>
+    </div>
+    <ul>
+      <li>T430 先只吃 desktop 里用不上的部分剥离（kate/录屏下线，kate 是 KDE 依赖链入口，gnupg 即被其拖入）。</li>
+      <li>裸 TTY 跑 gateway 没验证过之前，XFCE 保留当救生艇。</li>
+    </ul>
+    <div class="callout alert">
+      <span class="ca-label">注意</span>
+      <p>桌面层（xfce/i3/matugen）他没经验可抄，<strong>此领域本仓库自养</strong>。</p>
+    </div>
+
+    <h2 id="r-nocopy">明确不抄（记录理由，防下次心动）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>项</th><th>理由</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong><code>agenix</code></strong></td><td>单人三台机过重。但理念留档——secrets 加密进 git、agent clone 也读不到，与“agent 不得碰基模/auth”的立场同构。</td></tr>
+          <tr><td><strong><code>builders.nix</code> 五平台抽象</strong></td><td>无 macOS/WSL/容器需求，抄了是负资产。</td></tr>
+          <tr><td><strong>nushell 规范</strong></td><td>本人不用 nushell；他文档里十几条陷阱清单恰好证明迁移成本真实存在，观望即可。</td></tr>
+          <tr><td><strong>systemd unit hardening 层</strong></td><td>等 T430 常驻服务多起来再回头看。</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="r-links">关联</h2>
+    <ul>
+      <li>MindCache note: <code>t430-slimming-plan-pending</code>（瘦身/止血/桥接）</li>
+      <li>MindCache idea: <code>nixos-config 朋友仓库观察</code>（设备构成等背景）</li>
+    </ul>
+  </article>
+</main>
+
+<footer class="footer">
+  <span class="foot-path">~/nix/nixos</span>
+  <span>文档 · 借鉴清单</span>
+  <span><a href="index.html">索引</a> · <a href="new-pc-guide.html">新机器接入指南</a> · <a href="dotfiles-guide.html">dotfiles 同步系统参考手册</a> · <a href="design-notes.html">站点设计说明</a> · <a href="grok-build-config.html">Grok Build 配置</a> · <a href="hermes-agent.html">hermes-agent 安装</a> · <a href="npm.html">npm 备忘</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

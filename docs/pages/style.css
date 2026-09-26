@@ -163,6 +163,12 @@ code {
   font-family: "Arial Black", sans-serif; font-weight: 900; font-size: 26px;
   color: var(--accent); line-height: 1;
 }
+/* h2 不是定位上下文：绝对定位的步骤号会落到文档原点、被吸顶栏盖住，
+   所以标题里的编号改成行内，跟标题文字一起排 */
+.doc h2 .stepnum {
+  position: static; display: inline-block;
+  font-size: 22px; margin-right: 10px;
+}
 
 /* ---------- index 卡片：panel + 刻度尺 + 幽灵大字 ---------- */
 .index-body { max-width: 1180px; margin: 0 auto; padding: 8px 24px 64px }

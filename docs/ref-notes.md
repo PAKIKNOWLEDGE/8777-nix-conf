@@ -1,6 +1,6 @@
 # ref-notes — 借鉴 hakula139/nixos-config 的待落地项
 
-来源：朋友（大厂程序员）的公开仓库 https://github.com/hakula139/nixos-config
+来源： https://github.com/hakula139/nixos-config
 本地克隆：X250/T430 各自 `~/文档/nixos-config/`
 结论速览：值得抄的是结构纪律，不是平台抽象。按性价比排序如下，
 动手时机自定，均为"看着修复"候选项。
