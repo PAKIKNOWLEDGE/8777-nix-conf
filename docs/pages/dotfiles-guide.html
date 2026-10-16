@@ -176,8 +176,9 @@ dotfiles/sync.sh deploy --host thinkpadx250</code></pre>
       <li><code>hostname</code> → 查 <code>HOST_ALIASES</code> 映射</li>
       <li><code>hosts/&lt;hostname&gt;</code> 直接命中</li>
       <li>大小写不敏感兜底</li>
-      <li>都没有 → 提示“仅同步 common”，不报错</li>
+      <li>都没有 → <strong>直接退出，退出码 1</strong>。不会退回「仅同步 common」</li>
     </ol>
+    <p><code>deploy</code> / <code>sync</code> / <code>diff</code> / <code>list</code> 都会走这套识别。<code>init-host</code> 和 <code>fish-links</code> 不识别主机。识别失败如果继续，<code>deploy</code> 会用 common 盖掉本机 host 层，<code>sync</code> 会把本机 <code>~/.config</code> 写进 <code>common/</code>。<code>--host</code> 写的是 <code>dotfiles/hosts/</code> 下的目录名，不是 hostname；别名只在自动识别时查。</p>
     <p><code>HOST_ALIASES</code> 在脚本顶部：</p>
     <div class="cmd">
       <div class="cmd-bar"><span class="cmd-tag">配置</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
@@ -196,6 +197,7 @@ HOST_ALIASES=(
       <li><strong>本地产物免于 <code>--delete</code></strong>：托管应用目录内本地生成的文件（<code>completions/</code>、<code>conf.d/</code>、<code>functions/</code>、<code>fish_variables</code>、<code>*.log</code>）由 <code>P</code> 保护规则兜住，deploy 只覆盖仓库里有的东西，不会顺手删掉本机独有的。</li>
       <li><strong>deploy 前强制预览</strong>：先 dry-run 展示差异，除非 <code>--yes</code>。</li>
       <li><strong>差异按内容比较（rsync <code>-c</code>）</strong>：预览和真实部署用同一判据，所见即所得；<code>git pull</code> 刷新时间戳不会造成“全量假脏”。</li>
+      <li><strong>主机识别失败直接退出</strong>：<code>deploy</code> / <code>sync</code> / <code>diff</code> / <code>list</code> 找不到 <code>hosts/&lt;目录&gt;</code> 时退出码 1，不会退回仅同步 common。</li>
     </ol>
 
     <h2 id="d-patterns">同步模式清单（SYNC_PATTERNS）</h2>
@@ -253,7 +255,7 @@ sync.sh deploy               <span class="cm"># 部署公共配置</span>
         </thead>
         <tbody>
           <tr><td>deploy 提示“已是最新”但本地不对</td><td><code>sync.sh diff</code> 看差异；确认归属层放对</td></tr>
-          <tr><td>识别不到主机</td><td><code>--host X</code> 指定；或 <code>HOST_ALIASES</code> 加映射</td></tr>
+          <tr><td>识别不到主机</td><td>脚本直接退出（退出码 1）。<code>--host &lt;目录名&gt;</code>，或在 <code>HOST_ALIASES</code> 加映射；新机器先 <code>init-host</code></td></tr>
           <tr><td>覆盖后想后悔</td><td><code>~/.config/.dotfiles-backup/</code> 找时间戳备份</td></tr>
           <tr><td>备份占满磁盘</td><td>删旧备份目录即可，不影响任何配置</td></tr>
           <tr><td>一个应用出现在两个 host 层</td><td>归属规则让 host 层赢；把多余的挪走</td></tr>

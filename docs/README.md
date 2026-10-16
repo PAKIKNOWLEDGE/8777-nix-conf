@@ -17,6 +17,7 @@
 | [new-pc-guide.md](new-pc-guide.md) | **新机器接入**：NixOS + dotfiles 端到端流程，照着做就行 |
 | [dotfiles-guide.md](dotfiles-guide.md) | **dotfiles 同步系统参考**：分层规则、sync.sh 全部命令、安全机制、排障 |
 | [ref-notes.md](ref-notes.md) | **借鉴清单**：从 hakula139/nixos-config 提炼的可落地项（CI/集中清单/nh/模块化），待处理 |
+| [robustness.md](robustness.md) | **健壮性待办**：已记录、先不动。含 T430 退休搁置 |
 
 快速对照：
 

@@ -61,19 +61,30 @@ HOST_ALIASES=(
 )
 # ---------- 主机识别 ----------
 HOST_ARG=""      # --host 传入的值
-HOST_DIR=""      # 命中的 hosts/<name> 目录 (可为空 = 仅 common)
+HOST_DIR=""      # 命中的 hosts/<name> 目录；识别失败直接退出，禁止空着往下走
 HOST_NAME=""     # 命中的目录名
 
+# 识别失败必须退出。退回「仅 common」时，deploy 会用公共配置盖掉本机，
+# sync 会把本机 ~/.config 写进 common/，两台在役机器一起遭殃。
 resolve_host() {
   local want="$HOST_ARG"
+  local from_alias=0
   if [ -z "$want" ]; then
     want="$(hostname 2>/dev/null || true)"
     local mapped
     mapped="$(printf '%s\n' "${HOST_ALIASES[@]}" | awk -F: -v h="$want" '$1==h{print $2}')"
-    [ -n "$mapped" ] && want="$mapped"
+    if [ -n "$mapped" ]; then
+      want="$mapped"
+      from_alias=1
+    fi
   fi
 
-  if [ -n "$want" ] && [ -d "$HOSTS_DIR/$want" ]; then
+  if [ -z "$want" ]; then
+    echo "✗ 主机名为空，已中止。用 --host <目录名> 指定（不会退回仅同步 common）。" >&2
+    exit 1
+  fi
+
+  if [ -d "$HOSTS_DIR/$want" ]; then
     HOST_DIR="$HOSTS_DIR/$want"; HOST_NAME="$want"; return
   fi
 
@@ -87,7 +98,20 @@ resolve_host() {
     fi
   done
 
-  echo "ℹ 未找到 hosts/$want, 本次仅同步 common (可用 --host 指定)" >&2
+  echo "✗ 未找到 hosts/$want，已中止，不会退回仅同步 common。" >&2
+  local names=""
+  for d in "$HOSTS_DIR"/*/; do
+    [ -d "$d" ] || continue
+    names="$names $(basename "$d")"
+  done
+  echo "  现有目录:${names:- （无）}" >&2
+  if [ -n "$HOST_ARG" ]; then
+    echo "  --host 要写目录名（如 thinkpadx250），不是 hostname。别名只在自动识别时查。" >&2
+  elif [ "$from_alias" -eq 0 ]; then
+    echo "  hostname 与目录名不同时，在 HOST_ALIASES 登记一行 \"hostname:目录名\"。" >&2
+  fi
+  echo "  新机器先跑: ./sync.sh init-host <代号>" >&2
+  exit 1
 }
 
 # ---------- 分层 staging ----------
@@ -295,6 +319,7 @@ init_host() {
     echo "✅ 已创建占位符 dotfiles/hosts/$name/.gitkeep"
   fi
   echo "ℹ 该机 deploy 会自动识别 hostname → hosts/$name"
+  echo "ℹ 识别失败会直接退出，不会退回仅同步 common"
   echo "ℹ 有专属配置就把目录放进 dotfiles/hosts/$name/ 下"
   echo "ℹ NixOS 侧别忘: 1) flake.nix 加 nixosConfigurations.$name"
   echo "                 2) hosts/$name/hardware.nix + default.nix"

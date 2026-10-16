@@ -103,7 +103,7 @@ sudo nixos-rebuild switch --flake .#NewPC
 ~/nix/nixos/dotfiles/sync.sh deploy
 ```
 
-脚本自动按 `hostname` 识别主机。识别不到就加 `--host newpc`。
+脚本自动按 `hostname` 识别主机。识别不到会直接退出（不会退回只同步 common）；补 `--host newpc`，或先确认 `init-host` 已经建好同名目录。
 第一次部署会先预览差异 → 确认 → 写入（旧文件自动备份到 `~/.config/.dotfiles-backup/`）。
 
 ### 3.3 加专属配置（如果这台有）

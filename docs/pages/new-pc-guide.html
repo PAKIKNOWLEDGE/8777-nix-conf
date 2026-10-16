@@ -188,7 +188,7 @@ sudo nixos-rebuild switch --flake .#NewPC</code></pre>
       <div class="cmd-bar"><span class="cmd-tag in"><span class="glyph">↓</span>下发</span><span class="cmd-lang">bash</span><button class="cmd-copy" type="button">复制</button></div>
       <pre><code>~/nix/nixos/dotfiles/sync.sh deploy</code></pre>
     </div>
-    <p>脚本自动按 <code>hostname</code> 识别主机。识别不到就加 <code>--host newpc</code>。<br>
+    <p>脚本自动按 <code>hostname</code> 识别主机。识别不到会直接退出（不会退回只同步 common）；补 <code>--host newpc</code>，或先确认 <code>init-host</code> 已经建好同名目录。<br>
     第一次部署会先预览差异 → 确认 → 写入（旧文件自动备份到 <code>~/.config/.dotfiles-backup/</code>）。</p>
 
     <h3 id="s3-3">3.3 加专属配置（如果这台有）</h3>

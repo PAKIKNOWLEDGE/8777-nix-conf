@@ -60,6 +60,8 @@ docs/                  运维手册（new-pc-guide / dotfiles-guide / DESIGN_NOT
   免于 `--delete`）两条 rsync 规则。**不要改回 `--exclude`**：`--exclude` 让本地产物
   逃出 rsync 视野，`--delete` 就会把它们当"仓库里没有的东西"删掉（曾因此差点删掉
   本机 `~/.config/fish/fish_variables` 与 `completions/grok.fish`）。
+- `resolve_host` 失败必须退出（退出码 1），禁止退回「仅同步 common」。退回时
+  deploy 会用公共配置盖掉本机，sync 会把本机 `~/.config` 写进 `common/`。
 
 ## 已知问题清单（可修，修前报告）
 
@@ -78,7 +80,9 @@ docs/                  运维手册（new-pc-guide / dotfiles-guide / DESIGN_NOT
   的错误说法改成实际做法（按 hosts/<机器>/hardware.nix 入库、三台各一份）。
   `imports = [ ]` 仍在——它是上方 imports 教学注释的落点，删这行属行为/风格判断，未动。
 - `home.nix` 的 `programs.bash.initExtra` 配了 starship，但用户 shell 是 fish——死配置。
-- T430 是常开网关（hostname `Gater`），但防火墙在公共层全局关闭。
+- T430（hostname `Gater`）2026-10-16 起退休搁置：配置保留，不要删 flake 条目、
+  `hosts/T430/`、`dotfiles/hosts/t430/`。防火墙全局关闭、cloudflared 未进服务、
+  X250 的 tlp 等记在 `docs/robustness.md`，未授权不要改。
 - `docs/PLUGINS.md` 来源不明（DSH 插件清单），与仓库主题关系弱。
 
 ## 环境事实

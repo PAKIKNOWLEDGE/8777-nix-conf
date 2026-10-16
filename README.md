@@ -35,7 +35,7 @@
 |---|---|---|---|---|
 | `ThinkPadX250` | `K1llingMyL0v3` | `thinkpadx250` | 日常笔记本 | `tlp`；双电池 BAT0/BAT1 的 i3status-rust 配置 |
 | `pain` | `pain` | `pain` | 台式 | `zed-editor`；60 块 VGA 显示器的 EDID 注入（1366x768 modeline） |
-| `T430` | `Gater` | `t430` | 常开网关（Hermes） | `cloudflared`；合盖三种情况全部 `ignore`（不休眠） |
+| `T430` | `Gater` | `t430` | 退休搁置（配置保留，勿删） | `cloudflared`、合盖不休眠仍在；待办见 [docs/robustness.md](docs/robustness.md) |
 
 每台机器的 `hosts/<Host>/hardware.nix` 由该机自己 `nixos-generate-config` 生成，三台内容互不兼容，
 **不要跨机复制**。
@@ -119,8 +119,9 @@ dotfiles/sync.sh sync      # ~/.config → 仓库回写，按归属规则落位�
   `trusted-users = root pakiknowledge`；自动 GC 每周清 7 天前的 generation。
 - **镜像优先级**：SJTU > NJU > TUNA > USTC > cache.nixos.org（`flake.nix` 的 `extra-substituters`
   与 `configuration.nix` 的 `nix.settings.substituters` 两处都配了）。
-- **已知问题**：防火墙在公共层全局关闭，而 T430 是常开网关——这条挂在 AGENTS.md 待办里；
-  `home.nix` 的 `programs.bash.initExtra`（starship）对 fish 用户是死配置。
+- **已知问题**：T430 已退休搁置，防火墙、隧道未进服务、X250 的 tlp、GC 窗口等记在
+  [docs/robustness.md](docs/robustness.md)，未授权不要改。`home.nix` 的
+  `programs.bash.initExtra`（starship）对 fish 用户是死配置。
 
 ## dotfiles 同步系统要点
 

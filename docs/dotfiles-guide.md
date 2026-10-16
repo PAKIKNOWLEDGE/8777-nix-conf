@@ -96,7 +96,11 @@ dotfiles/sync.sh deploy --host thinkpadx250
 2. `hostname` → 查 `HOST_ALIASES` 映射
 3. `hosts/<hostname>` 直接命中
 4. 大小写不敏感兜底
-5. 都没有 → 提示"仅同步 common"，不报错
+5. 都没有 → **直接退出，退出码 1**。不会退回「仅同步 common」
+
+`deploy` / `sync` / `diff` / `list` 都会走这套识别。`init-host` 和 `fish-links` 不识别主机。
+
+识别失败如果继续，`deploy` 会用 common 盖掉本机 host 层，`sync` 会把本机 `~/.config` 写进 `common/`。所以失败就是失败，补 `--host <目录名>` 或先 `init-host`。`--host` 写的是 `dotfiles/hosts/` 下的目录名，不是 hostname；别名只在自动识别时查。
 
 `HOST_ALIASES` 在脚本顶部：
 
@@ -104,6 +108,7 @@ dotfiles/sync.sh deploy --host thinkpadx250
 # hostname 与目录名不一致时登记: "机器hostname:目录名"
 HOST_ALIASES=(
   "K1llingMyL0v3:thinkpadx250"
+  "Gater:t430"
 )
 ```
 
@@ -117,6 +122,7 @@ HOST_ALIASES=(
    deploy 只覆盖仓库里有的东西，不会顺手删掉本机独有的。
 5. **deploy 前强制预览**：先 dry-run 展示差异，除非 `--yes`。
 6. **差异按内容比较（rsync `-c`）**：预览和真实部署用同一判据，所见即所得；`git pull` 刷新时间戳不会造成"全量假脏"。
+7. **主机识别失败直接退出**：`deploy` / `sync` / `diff` / `list` 找不到 `hosts/<目录>` 时退出码 1，不会退回仅同步 common。
 
 ## 同步模式清单（SYNC_PATTERNS）
 
@@ -173,7 +179,7 @@ sync.sh deploy               # 部署公共配置
 | 现象 | 处理 |
 |---|---|
 | deploy 提示"已是最新"但本地不对 | `sync.sh diff` 看差异；确认归属层放对 |
-| 识别不到主机 | `--host X` 指定；或 `HOST_ALIASES` 加映射 |
+| 识别不到主机 | 脚本直接退出（退出码 1）。`--host <目录名>`，或在 `HOST_ALIASES` 加映射；新机器先 `init-host` |
 | 覆盖后想后悔 | `~/.config/.dotfiles-backup/` 找时间戳备份 |
 | 备份占满磁盘 | 删旧备份目录即可，不影响任何配置 |
 | 一个应用出现在两个 host 层 | 归属规则让 host 层赢；把多余的挪走 |

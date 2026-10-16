@@ -5,6 +5,8 @@
 结论速览：值得抄的是结构纪律，不是平台抽象。按性价比排序如下，
 动手时机自定，均为"看着修复"候选项。
 
+T430 自 2026-10-16 起退休搁置，配置保留。下面涉及 T430 瘦身 / 网关角色的条目先不要动，背景见 [robustness.md](robustness.md)。
+
 ## 1. GitHub Actions CI（白嫖，最先做）
 
 本仓库是公开库，GitHub Actions 对 public repo 免费无限跑。
