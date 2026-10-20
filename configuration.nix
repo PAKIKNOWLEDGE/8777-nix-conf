@@ -247,6 +247,7 @@
     haskellPackages.greenclip # 剪贴板管理器
     simplescreenrecorder # x11录屏
     mdwatch # 轻量预览
+    peazip # GUI UNZIP
     
     # ── Home Manager ──
     home-manager # 用户级包管理器工具
