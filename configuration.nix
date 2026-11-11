@@ -12,7 +12,7 @@
     cd ~/nix/nixos && sudo nixos-rebuild switch --flake .#ThinkPadX250
   装机时指定国内镜像再构建：
     sudo nixos-install --flake /路径/到/仓库#ThinkPadX250 \
-      --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
+      --option substituters "https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://cache.nixos.org/"
 
   切记：hardware-configuration.nix 是每台机器独一无二的，别跨机复制；本仓库按
   hosts/<机器>/hardware.nix 入库跟踪（三台各一份，内容互不兼容）。
@@ -300,13 +300,15 @@
 
   # ----- 8777 的个人定制部分 -----
 
-  # 镜像优先级：SJTU > NJU > TUNA > USTC > cache.nixos.org
+  # 镜像优先级：NJU > TUNA > USTC > SJTU > cache.nixos.org
+  # 列表顺序即查询优先级。SJTU 自 2026-11 起不稳定（拉包超时/404），降为末位镜像，
+  # 仍保留条目以便其恢复后直接上移；要彻底摘掉时删掉那行即可。
   nix.settings = {
     substituters = [
-      "https://mirror.sjtu.edu.cn/nix-channels/store" # SJTU 上交
       "https://mirrors.nju.edu.cn/nix-channels/store" # NJU 南大
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" # TUNA 清华
       "https://mirrors.ustc.edu.cn/nix-channels/store" # USTC 中科大
+      "https://mirror.sjtu.edu.cn/nix-channels/store" # SJTU 上交（降级：近期不稳定）
       "https://cache.nixos.org/"
     ];
     trusted-users = [
@@ -321,7 +323,7 @@
 
   # 首次装机时指定国内镜像（避免从国外拉包卡死）：
   #   sudo nixos-install --flake /路径/到/仓库#ThinkPadX250 \
-  #     --option substituters "https://mirrors.ustc.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://cache.nixos.org/"
+  #     --option substituters "https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://cache.nixos.org/"
 
   # 自动垃圾回收——每周清理 7 天前的旧 generation
   nix.gc = {

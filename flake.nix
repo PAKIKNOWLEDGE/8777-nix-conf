@@ -2,11 +2,13 @@
   description = "PAKI KNOWLEDGE NixOS Configuration";
 
   nixConfig = {
+    # 顺序即优先级：NJU > TUNA > USTC > SJTU > cache.nixos.org。
+    # SJTU 自 2026-11 起不稳定，降到末位（仍保留，恢复后可直接上移）。
     extra-substituters = [
-      "https://mirror.sjtu.edu.cn/nix-channels/store"
       "https://mirrors.nju.edu.cn/nix-channels/store"
       "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://mirrors.ustc.edu.cn/nix-channels/store"
+      "https://mirror.sjtu.edu.cn/nix-channels/store"
     ];
   };
 

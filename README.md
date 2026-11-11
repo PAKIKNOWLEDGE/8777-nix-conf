@@ -86,7 +86,7 @@ dotfiles/sync.sh sync      # ~/.config → 仓库回写，按归属规则落位�
 
   ```bash
   sudo nixos-install --flake ~/nix/nixos#<Host> \
-    --option substituters "https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/"
+    --option substituters "https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://cache.nixos.org/"
   ```
 
 ## Flake inputs 与那个 25.11 pin
@@ -117,8 +117,9 @@ dotfiles/sync.sh sync      # ~/.config → 仓库回写，按归属规则落位�
   `programs.dconf` 开启，否则 GTK 主题 `settings.ini` 读不到。
 - **构建体验**：`allowUnfree = true`；`nix-command` + `flakes` 实验特性开启；
   `trusted-users = root pakiknowledge`；自动 GC 每周清 7 天前的 generation。
-- **镜像优先级**：SJTU > NJU > TUNA > USTC > cache.nixos.org（`flake.nix` 的 `extra-substituters`
+- **镜像优先级**：NJU > TUNA > USTC > SJTU > cache.nixos.org（`flake.nix` 的 `extra-substituters`
   与 `configuration.nix` 的 `nix.settings.substituters` 两处都配了）。
+  SJTU 自 2026-11 起不稳定，已从首位降到末位镜像，条目保留以便恢复后上移。
 - **已知问题**：T430 已退休搁置，防火墙、隧道未进服务、X250 的 tlp、GC 窗口等记在
   [docs/robustness.md](docs/robustness.md)，未授权不要改。`home.nix` 的
   `programs.bash.initExtra`（starship）对 fish 用户是死配置。

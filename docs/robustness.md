@@ -57,6 +57,53 @@ ly / XFCE / i3 / PipeWire 都在 `configuration.nix`，T430 作为网关时照�
 `configuration.nix` 里 `nix.gc` 每周跑，`options = "--delete-older-than 7d"`。
 systemd-boot `configurationLimit = 5`。过了一周才发现的问题，旧 generation 的 store 路径可能已经清掉。
 
+## 上游版本：由 pin 决定，不跟上游
+
+### firefox 落后 6 个 feature release（2026-10-24 核对）
+
+`configuration.nix` 里只有 `programs.firefox.enable = true;`，没有任何版本约束，所以浏览器版本
+完全等于 `flake.lock` 主 pin 里 nixpkgs 的 firefox。核对时：
+
+| 项 | 值 |
+|---|---|
+| 主 pin | `nixos-26.05` rev `4382ed2b`，`lastModified` = 2026-07-16 08:11 CST |
+| pin 里的 firefox | `152.0.6` |
+| 实机 | `/nix/store/id170z3x…-firefox-152.0.6`，系统代际 `26.05.20260716.4382ed2` |
+| 上游同时点 | `158.0.1`（`LAST_RELEASE_DATE: 2026-10-23`），ESR `153.5.1esr` |
+
+复现（只读）：
+
+```bash
+# pin 时间戳（仓库里没装 jq，用 nix 读；受限环境需另外重定向 XDG_CACHE_HOME/XDG_STATE_HOME）
+date -d @$(nix eval --raw --impure --expr '(builtins.toString (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes.nixpkgs.locked.lastModified)')
+nix eval --raw .#nixosConfigurations.ThinkPadX250.config.programs.firefox.package.version
+curl -s https://product-details.mozilla.org/1.0/firefox_versions.json | grep -E 'LATEST_FIREFOX_VERSION|LAST_RELEASE_DATE'
+```
+
+差 6 个 feature release、约 3 个月安全更新。版本区间上落在 `CVE-2026-106016`
+（File Handling 的 mitigation bypass，157.0.1 修复，NVD CVSS 3.1 9.8，CPE `firefox < 157.0.1`）
+的受影响范围内，但 CISA SSVC 当时为 `exploitation: none`、`automatable: yes`，即没有在野利用证据。
+2026-10-24 用 we-have-a-problem.com 自查的结论是「本机火狐无安全问题」，那一结论对应的是上面
+`exploitation: none` 这一点（没有在野利用证据）。两条记录并存、互不冲突：一条是暴露风险评估，
+一条是版本事实。区别在于，前者的结论会随利用态势变化（`automatable` 是 `yes`），后者不会自己变。
+
+收法（人执行，先 build 不 switch）：`nix flake update nixpkgs` → 看 `git diff flake.lock` →
+`sudo nixos-rebuild build --flake .#ThinkPadX250` → 满意再 `switch`。
+krita 走 `home.nix` 里的 `pkgs-25-11.krita`，主 pin 更新不会碰它，25.11 的 lock 条目也不动；
+但主 pin 从 7 月跳到 10 月会连带内核与 systemd，不只是浏览器。
+
+### PHP2Shell：零暴露（2026-10-24 排查）
+
+`CVE-2026-109618` / `CVE-2026-109619`，2026-10-21 发版，修 8.2.35 / 8.3.36 / 8.4.27 / 8.5.12，
+均为未授权 RCE（CVSS v4.0 9.2），影响所有对外提供 web 请求的 PHP。
+
+全仓库 `php` 的命中只有两处纯装饰引用：`dotfiles/common/starship-*.toml` 的 `$php` 提示符模块，
+和 `dotfiles/common/matugen/templates/yazi-theme.toml` 的 `blade.php` / `php` 文件图标映射。
+没有 `pkgs.php`，没有 PHP-FPM / mod_php / nginx+php 任何服务定义。
+
+结论：三台机器都没有可被打的 PHP 进程，不在影响面内，**不需要动作**。
+本条留着，下次同类预警可以直接复用这个结论，不用重查。
+
 ## 较小，特定时刻才会绊人
 
 - 用户名 `pakiknowledge` 写在 `configuration.nix` 的 `users.users`、`home.nix` 的 `home.username` / `home.homeDirectory`、`flake.nix` 的 `homeConfigurations.pakiknowledge`、`nix.settings.trusted-users`。改名会同时拆登录、home-manager 和信任用户。

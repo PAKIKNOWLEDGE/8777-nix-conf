@@ -4,7 +4,9 @@
 set -euo pipefail
 
 CONF="/etc/nix/nix.conf"
-MIRRORS="substituters = https://mirror.sjtu.edu.cn/nix-channels/store https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/"
+# 顺序即优先级：NJU > TUNA > USTC > SJTU > cache.nixos.org
+# SJTU 自 2026-11 起不稳定，降到末位镜像（条目保留，恢复后上移即可）。
+MIRRORS="substituters = https://mirrors.nju.edu.cn/nix-channels/store https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://mirrors.ustc.edu.cn/nix-channels/store https://mirror.sjtu.edu.cn/nix-channels/store https://cache.nixos.org/"
 
 if [ "$(id -u)" -ne 0 ]; then
   echo "请用 sudo 运行：sudo $0"
